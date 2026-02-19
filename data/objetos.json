@@ -1,37 +1,143 @@
 {
-  "_instrucciones": "Cada objeto tiene nombre, tipo, descripcion y un gancho narrativo opcional. Podés agregar objetos a cualquier categoría o crear categorías nuevas.",
+  "_instrucciones": "Cada objeto tiene nombre, descripcion, gancho, rareza, precio_po (piezas de oro estimadas) y tags. Tags mezclan mecanicos de DW con descriptores narrativos.",
+
   "categorias": [
     {
       "id": "armas",
       "label": "Armas",
       "items": [
-        { "nombre": "Espada de filo mellado", "descripcion": "Una espada larga con el filo lleno de muescas. Claramente sobrevivió más batallas de las que debería.", "gancho": "La empuñadura tiene grabado un nombre que nadie del grupo reconoce." },
-        { "nombre": "Daga con veneno reseco", "descripcion": "Una daga fina, equilibrada, con restos de algo oscuro en el canal del filo. El veneno está seco, pero la hoja sigue siendo perfecta.", "gancho": "El veneno no es de ninguna planta local." },
-        { "nombre": "Arco sin cuerda", "descripcion": "Un arco de madera excepcional, perfectamente curvado, sin cuerda. La madera tiene marcas de uso intenso.", "gancho": "Nadie puede identificar la madera. No crece en ningún bosque conocido." },
-        { "nombre": "Hacha de guerra con runa borrada", "descripcion": "Un hacha pesada con una runa grabada en la hoja. Alguien intentó borrarla y no terminó el trabajo.", "gancho": "La runa incompleta hace que el arma vibre levemente al acercarse a magia." },
-        { "nombre": "Lanza rota", "descripcion": "La mitad de una lanza de guerra. El corte es limpio, casi quirúrgico. No fue rota por impacto.", "gancho": "La otra mitad podría estar en manos de alguien importante." }
+        {
+          "nombre": "Espada de filo mellado",
+          "descripcion": "Una espada larga con el filo lleno de muescas. Claramente sobrevivio mas batallas de las que deberia.",
+          "gancho": "La empunadura tiene grabado un nombre que nadie del grupo reconoce.",
+          "rareza": "Comun",
+          "precio_po": 15,
+          "tags": ["cercano", "1d8 dano", "historia visible", "confiable"]
+        },
+        {
+          "nombre": "Daga con veneno reseco",
+          "descripcion": "Una daga fina, equilibrada, con restos de algo oscuro en el canal del filo. El veneno esta seco, pero la hoja sigue siendo perfecta.",
+          "gancho": "El veneno no es de ninguna planta local.",
+          "rareza": "Poco comun",
+          "precio_po": 60,
+          "tags": ["cercano", "1d6 dano", "preciso", "envenendado (inactivo)", "discreto"]
+        },
+        {
+          "nombre": "Arco sin cuerda",
+          "descripcion": "Un arco de madera excepcional, perfectamente curvado, sin cuerda. La madera tiene marcas de uso intenso.",
+          "gancho": "Nadie puede identificar la madera. No crece en ningun bosque conocido.",
+          "rareza": "Raro",
+          "precio_po": 120,
+          "tags": ["lejano", "1d8 dano", "misterioso", "incompleto"]
+        },
+        {
+          "nombre": "Hacha de guerra con runa borrada",
+          "descripcion": "Un hacha pesada con una runa grabada en la hoja. Alguien intento borrarla y no termino el trabajo.",
+          "gancho": "La runa incompleta hace que el arma vibre levemente al acercarse a magia.",
+          "rareza": "Poco comun",
+          "precio_po": 80,
+          "tags": ["cercano", "2 manos", "1d10 dano", "magico (debilitado)", "detecta magia"]
+        },
+        {
+          "nombre": "Lanza rota",
+          "descripcion": "La mitad de una lanza de guerra. El corte es limpio, casi quirurgico. No fue rota por impacto.",
+          "gancho": "La otra mitad podria estar en manos de alguien importante.",
+          "rareza": "Comun",
+          "precio_po": 5,
+          "tags": ["cercano", "1d6 dano", "improvisada", "narrativamente valiosa"]
+        }
       ]
     },
     {
       "id": "magicos",
-      "label": "Objetos Mágicos",
+      "label": "Objetos Magicos",
       "items": [
-        { "nombre": "Vela que no se apaga", "descripcion": "Una vela de cera negra que arde sin consumirse. La llama es azul y no proyecta sombras.", "gancho": "Los animales la evitan. Los no-muertos se acercan a ella." },
-        { "nombre": "Espejo que muestra el pasado", "descripcion": "Un espejo pequeño que, bajo cierta luz, muestra escenas de lo que ocurrió en el lugar donde se encuentra. Las imágenes son mudas.", "gancho": "Una de las escenas muestra a uno de los PJs, pero en un momento que aún no ocurrió." },
-        { "nombre": "Llave que no abre nada conocido", "descripcion": "Una llave de hierro negro, perfecta, que no encaja en ninguna cerradura que hayan visto. Pesa más de lo que debería.", "gancho": "Quienes la llevan tienen sueños con una puerta específica." },
-        { "nombre": "Moneda de cara desconocida", "descripcion": "Una moneda de oro con el perfil de un soberano que nadie reconoce. El reverso tiene una fecha. La fecha es futura.", "gancho": "La moneda siempre cae del mismo lado." },
-        { "nombre": "Libro en blanco que escribe solo", "descripcion": "Un diario encuadernado en cuero. Las páginas parecen en blanco hasta que lo abrís bajo la luz de la luna.", "gancho": "Lo que escribe parece saber cosas sobre quienes lo sostienen." }
+        {
+          "nombre": "Vela que no se apaga",
+          "descripcion": "Una vela de cera negra que arde sin consumirse. La llama es azul y no proyecta sombras.",
+          "gancho": "Los animales la evitan. Los no-muertos se acercan a ella.",
+          "rareza": "Raro",
+          "precio_po": 300,
+          "tags": ["magico", "luz fria", "atrae no-muertos", "inextinguible", "inquietante"]
+        },
+        {
+          "nombre": "Espejo que muestra el pasado",
+          "descripcion": "Un espejo pequeno que, bajo cierta luz, muestra escenas de lo que ocurrio en el lugar donde se encuentra. Las imagenes son mudas.",
+          "gancho": "Una de las escenas muestra a uno de los PJs, pero en un momento que aun no ocurrio.",
+          "rareza": "Muy raro",
+          "precio_po": 800,
+          "tags": ["magico", "vision del pasado", "mudo", "revelador", "perturbador"]
+        },
+        {
+          "nombre": "Llave que no abre nada conocido",
+          "descripcion": "Una llave de hierro negro, perfecta, que no encaja en ninguna cerradura que hayan visto. Pesa mas de lo que deberia.",
+          "gancho": "Quienes la llevan tienen suenos con una puerta especifica.",
+          "rareza": "Raro",
+          "precio_po": 200,
+          "tags": ["magico", "pesada", "onirico", "llave de algo", "misterioso"]
+        },
+        {
+          "nombre": "Moneda de cara desconocida",
+          "descripcion": "Una moneda de oro con el perfil de un soberano que nadie reconoce. El reverso tiene una fecha. La fecha es futura.",
+          "gancho": "La moneda siempre cae del mismo lado.",
+          "rareza": "Poco comun",
+          "precio_po": 150,
+          "tags": ["magico", "profetico", "manipulado", "invendible"]
+        },
+        {
+          "nombre": "Libro en blanco que escribe solo",
+          "descripcion": "Un diario encuadernado en cuero. Las paginas parecen en blanco hasta que lo abris bajo la luz de la luna.",
+          "gancho": "Lo que escribe parece saber cosas sobre quienes lo sostienen.",
+          "rareza": "Muy raro",
+          "precio_po": 1200,
+          "tags": ["magico", "lunar", "omnisciente", "peligroso", "revelador"]
+        }
       ]
     },
     {
       "id": "mundanos",
       "label": "Objetos Mundanos",
       "items": [
-        { "nombre": "Mapa incompleto", "descripcion": "Un mapa dibujado a mano con buena técnica. Le falta un sector entero, claramente cortado con cuchillo.", "gancho": "El sector que falta coincide con el área que necesitan explorar." },
-        { "nombre": "Carta sin destinatario", "descripcion": "Una carta sellada sin nombre en el sobre. El sello es de una casa noble que ya no existe.", "gancho": "El contenido implica una traición a alguien que todavía está vivo." },
-        { "nombre": "Frasco de líquido sin etiqueta", "descripcion": "Un frasco de vidrio grueso con un líquido espeso de color ámbar. No huele a nada.", "gancho": "No se congela. No hierve. No reacciona a nada." },
-        { "nombre": "Medallón con retrato borrado", "descripcion": "Un medallón de plata con un retrato pintado en miniatura. El rostro fue borrado deliberadamente con algo abrasivo.", "gancho": "La ropa del retrato permite fechar la pintura en menos de diez años." },
-        { "nombre": "Llave de posada con número", "descripcion": "Una llave de madera con el número 7 tallado. La posada a la que pertenece no está claro.", "gancho": "Alguien la está buscando activamente." }
+        {
+          "nombre": "Mapa incompleto",
+          "descripcion": "Un mapa dibujado a mano con buena tecnica. Le falta un sector entero, claramente cortado con cuchillo.",
+          "gancho": "El sector que falta coincide con el area que necesitan explorar.",
+          "rareza": "Comun",
+          "precio_po": 20,
+          "tags": ["informacion", "incompleto", "valioso contextualmente", "hecho a mano"]
+        },
+        {
+          "nombre": "Carta sin destinatario",
+          "descripcion": "Una carta sellada sin nombre en el sobre. El sello es de una casa noble que ya no existe.",
+          "gancho": "El contenido implica una traicion a alguien que todavia esta vivo.",
+          "rareza": "Comun",
+          "precio_po": 0,
+          "tags": ["informacion", "comprometedor", "historico", "peligroso de tener"]
+        },
+        {
+          "nombre": "Frasco de liquido sin etiqueta",
+          "descripcion": "Un frasco de vidrio grueso con un liquido espeso de color ambar. No huele a nada.",
+          "gancho": "No se congela. No hierve. No reacciona a nada.",
+          "rareza": "Desconocida",
+          "precio_po": 0,
+          "tags": ["desconocido", "estable", "posiblemente magico", "sin clasificar"]
+        },
+        {
+          "nombre": "Medallon con retrato borrado",
+          "descripcion": "Un medallon de plata con un retrato pintado en miniatura. El rostro fue borrado deliberadamente con algo abrasivo.",
+          "gancho": "La ropa del retrato permite fechar la pintura en menos de diez anos.",
+          "rareza": "Comun",
+          "precio_po": 35,
+          "tags": ["personal", "misterioso", "reciente", "alguien lo extrania"]
+        },
+        {
+          "nombre": "Llave de posada con numero",
+          "descripcion": "Una llave de madera con el numero 7 tallado. La posada a la que pertenece no esta claro.",
+          "gancho": "Alguien la esta buscando activamente.",
+          "rareza": "Comun",
+          "precio_po": 0,
+          "tags": ["mundano", "buscado", "acceso a algo", "sin contexto"]
+        }
       ]
     }
   ]

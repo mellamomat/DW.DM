@@ -499,6 +499,125 @@
     line-height: 1.5;
   }
 
+  /* ── GUARDADOS ── */
+  .save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    background: none;
+    border: 1px solid var(--border-glow);
+    color: var(--border-glow);
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+  .save-btn:hover { background: rgba(139,105,20,0.15); color: var(--gold-light); border-color: var(--gold); }
+  .save-btn.saved { border-color: var(--green); color: var(--green); pointer-events: none; }
+
+  .saved-section {
+    margin-top: 2rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+  }
+
+  .saved-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .saved-count {
+    background: rgba(201,168,76,0.15);
+    color: var(--gold);
+    border-radius: 20px;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.6rem;
+  }
+
+  .saved-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .saved-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .saved-item-body { flex: 1; min-width: 0; cursor: pointer; }
+
+  .saved-item-title {
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    color: var(--text-bright);
+    margin-bottom: 0.2rem;
+  }
+
+  .saved-item-sub {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .saved-item-detail {
+    display: none;
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.9rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .saved-item.open .saved-item-detail { display: block; }
+
+  .saved-item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+
+  .del-btn {
+    background: none;
+    border: 1px solid rgba(224,90,75,0.3);
+    color: rgba(224,90,75,0.5);
+    font-size: 0.8rem;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .del-btn:hover { background: rgba(224,90,75,0.1); color: var(--red); border-color: var(--red); }
+
+  .saved-empty {
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+  }
+
   /* scrollbar */
   ::-webkit-scrollbar { width: 5px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -540,6 +659,10 @@
   <div class="gen-panel active" id="gen-npc">
     <button class="gen-btn" onclick="genNPC()">⚄ Generar NPC</button>
     <div id="npc-result"></div>
+    <div class="saved-section">
+      <div class="saved-title">Guardados <span class="saved-count" id="npc-count">0</span></div>
+      <div class="saved-list" id="npc-saved"></div>
+    </div>
   </div>
 
   <!-- OBJETOS -->
@@ -547,12 +670,20 @@
     <div id="obj-cat-tabs" style="margin-bottom:1rem;"></div>
     <button class="gen-btn" onclick="genObjeto()">⚄ Generar objeto</button>
     <div id="obj-result"></div>
+    <div class="saved-section">
+      <div class="saved-title">Guardados <span class="saved-count" id="obj-count">0</span></div>
+      <div class="saved-list" id="obj-saved"></div>
+    </div>
   </div>
 
   <!-- FACCIONES -->
   <div class="gen-panel" id="gen-fac">
     <button class="gen-btn" onclick="genFaccion()">⚄ Generar facción</button>
     <div id="fac-result"></div>
+    <div class="saved-section">
+      <div class="saved-title">Guardados <span class="saved-count" id="fac-count">0</span></div>
+      <div class="saved-list" id="fac-saved"></div>
+    </div>
   </div>
 </section>
 
@@ -589,6 +720,7 @@ async function loadAll() {
     DATA.facciones = facciones;
     initMoves();
     initObjCats();
+    initSaved();
   } catch(e) {
     document.getElementById('moves-content').innerHTML =
       '<div class="loading" style="color:var(--red)">Error cargando datos. Verificá que los archivos JSON estén en la carpeta /data.</div>';
@@ -661,6 +793,105 @@ function renderMovesList() {
     </div>`;
 }
 
+// ═══════════ STORAGE ═══════════
+function getSaved(type) {
+  try { return JSON.parse(localStorage.getItem('dw_saved_' + type) || '[]'); }
+  catch { return []; }
+}
+
+function setSaved(type, arr) {
+  localStorage.setItem('dw_saved_' + type, JSON.stringify(arr));
+}
+
+function saveItem(type, item) {
+  const arr = getSaved(type);
+  item.id = Date.now();
+  arr.unshift(item);
+  setSaved(type, arr);
+  renderSaved(type);
+}
+
+function deleteItem(type, id) {
+  const arr = getSaved(type).filter(i => i.id !== id);
+  setSaved(type, arr);
+  renderSaved(type);
+}
+
+function renderSaved(type) {
+  const arr = getSaved(type);
+  const list = document.getElementById(type + '-saved');
+  const count = document.getElementById(type + '-count');
+  if (!list) return;
+  count.textContent = arr.length;
+
+  if (arr.length === 0) {
+    list.innerHTML = '<div class="saved-empty">Nada guardado todavía.</div>';
+    return;
+  }
+
+  list.innerHTML = arr.map(item => {
+    let title = '', sub = '', detail = '';
+
+    if (type === 'npc') {
+      title = item.nombre;
+      sub = item.ocupacion;
+      detail = `
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.8rem;">
+          <span style="background:rgba(224,90,75,0.12);border:1px solid rgba(224,90,75,0.3);color:#e05a4b;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${item.pv} PV · ${item.peligrosidad || ''}</span>
+          ${(item.tags||[]).map(t=>`<span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${t}</span>`).join('')}
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Apariencia · </span>${item.rasgo}</div>
+          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Quiere · </span>${item.motiv}</div>
+          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Comportamiento · </span>${item.actitud || ''}</div>
+          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Secreto · </span>${item.secreto}</div>
+        </div>`;
+    } else if (type === 'obj') {
+      title = item.nombre;
+      sub = item.categoria;
+      const precioStr = item.precio_po === 0 ? 'Sin valor de mercado' : `~${item.precio_po} po`;
+      detail = `
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.8rem;">
+          <span style="background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${item.rareza||''}</span>
+          <span style="background:rgba(93,190,122,0.1);border:1px solid rgba(93,190,122,0.3);color:#5dbe7a;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${precioStr}</span>
+          ${(item.tags||[]).map(t=>`<span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${t}</span>`).join('')}
+        </div>
+        <p>${item.descripcion}</p>${item.gancho ? `<div style="margin-top:0.6rem;padding:0.6rem 0.8rem;background:rgba(0,0,0,0.3);border-left:2px solid var(--border-glow);font-style:italic;color:var(--text-dim);">${item.gancho}</div>` : ''}`;
+    } else if (type === 'fac') {
+      title = 'Un ' + item.tipo;
+      sub = item.rasgo;
+      detail = `
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.8rem;">
+          <span style="background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${item.tamano||''} · ${item.tamano_desc||''}</span>
+          <span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">~${item.miembros||'?'} miembros</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.5rem;">
+          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Recurso · </span>${item.recurso}</div>
+          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Objetivo · </span>${item.quiere}</div>
+          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Antagonista de · </span>${item.antag}</div>
+          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Gancho · </span>${item.gancho}</div>
+        </div>`;
+    }
+
+    return `<div class="saved-item" id="saved-${item.id}">
+      <div class="saved-item-body" onclick="document.getElementById('saved-${item.id}').classList.toggle('open')">
+        <div class="saved-item-title">${title}</div>
+        <div class="saved-item-sub">${sub}</div>
+        <div class="saved-item-detail">${detail}</div>
+      </div>
+      <div class="saved-item-actions">
+        <button class="del-btn" onclick="deleteItem('${type}', ${item.id})" title="Borrar">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function initSaved() {
+  renderSaved('npc');
+  renderSaved('obj');
+  renderSaved('fac');
+}
+
 // ═══════════ NPC GENERATOR ═══════════
 function genNPC() {
   const d = DATA.npcs;
@@ -670,25 +901,36 @@ function genNPC() {
   const rasgo     = rand(d.rasgos_fisicos);
   const motiv     = rand(d.motivaciones);
   const secreto   = rand(d.secretos);
+  const actitud   = rand(d.actitudes);
+
+  // PV segun categoria aleatoria
+  const cat = rand(d.categorias_peligrosidad);
+  const pv  = Math.floor(Math.random() * (cat.pv_max - cat.pv_min + 1)) + cat.pv_min;
+
+  // 2-3 tags al azar sin repetir
+  const shuffled = [...d.tags].sort(() => Math.random() - 0.5);
+  const nTags = 2 + Math.floor(Math.random() * 2); // 2 o 3
+  const tags  = shuffled.slice(0, nTags);
+
+  const data = { nombre, ocupacion, rasgo, motiv, secreto, actitud, pv, peligrosidad: cat.label, tags };
 
   document.getElementById('npc-result').innerHTML = `
     <div class="npc-card">
       <div class="npc-name">${nombre}</div>
       <div class="npc-occ">${ocupacion}</div>
-      <div class="npc-rows">
-        <div class="npc-row">
-          <div class="npc-key">Apariencia</div>
-          <div class="npc-val">${rasgo}</div>
-        </div>
-        <div class="npc-row">
-          <div class="npc-key">Quiere</div>
-          <div class="npc-val">${motiv}</div>
-        </div>
-        <div class="npc-row">
-          <div class="npc-key">Secreto</div>
-          <div class="npc-val">${secreto}</div>
-        </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <span style="background:rgba(224,90,75,0.12);border:1px solid rgba(224,90,75,0.3);color:#e05a4b;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${pv} PV · ${cat.label}</span>
+        ${tags.map(t => `<span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${t}</span>`).join('')}
       </div>
+      <div class="npc-rows">
+        <div class="npc-row"><div class="npc-key">Apariencia</div><div class="npc-val">${rasgo}</div></div>
+        <div class="npc-row"><div class="npc-key">Quiere</div><div class="npc-val">${motiv}</div></div>
+        <div class="npc-row"><div class="npc-key">Comportamiento</div><div class="npc-val">${actitud}</div></div>
+        <div class="npc-row"><div class="npc-key">Secreto</div><div class="npc-val">${secreto}</div></div>
+      </div>
+      <button class="save-btn" onclick="saveItem('npc', ${JSON.stringify(data).replace(/"/g, '&quot;')}); this.textContent='✓ Guardado'; this.classList.add('saved')">
+        ✦ Guardar NPC
+      </button>
     </div>`;
 }
 
@@ -714,50 +956,61 @@ function genObjeto() {
   const cat = DATA.objetos.categorias.find(c => c.id === selectedObjCat);
   if (!cat) return;
   const item = rand(cat.items);
+  const data = { nombre: item.nombre, categoria: cat.label, descripcion: item.descripcion, gancho: item.gancho || '', rareza: item.rareza, precio_po: item.precio_po, tags: item.tags };
+
+  const tagsHtml = (item.tags || []).map(t =>
+    `<span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${t}</span>`
+  ).join('');
+
+  const precioStr = item.precio_po === 0 ? 'Sin valor de mercado' : `~${item.precio_po} po`;
+
   document.getElementById('obj-result').innerHTML = `
     <div class="obj-card">
       <div class="obj-tipo">${cat.label}</div>
       <div class="obj-nombre">${item.nombre}</div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;">
+        <span style="background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${item.rareza}</span>
+        <span style="background:rgba(93,190,122,0.1);border:1px solid rgba(93,190,122,0.3);color:#5dbe7a;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${precioStr}</span>
+        ${tagsHtml}
+      </div>
       <div class="obj-desc">${item.descripcion}</div>
       ${item.gancho ? `<div class="obj-gancho">${item.gancho}</div>` : ''}
+      <button class="save-btn" onclick="saveItem('obj', ${JSON.stringify(data).replace(/"/g, '&quot;')}); this.textContent='✓ Guardado'; this.classList.add('saved')">
+        ✦ Guardar objeto
+      </button>
     </div>`;
 }
 
 // ═══════════ FACCION GENERATOR ═══════════
 function genFaccion() {
   const d = DATA.facciones;
-  const tipo       = rand(d.tipos);
-  const rasgo      = rand(d.rasgos_distintivos);
-  const recurso    = rand(d.recursos);
-  const quiere     = rand(d.quieren);
-  const antag      = rand(d.antagonistas_de);
-  const gancho     = rand(d.ganchos);
+  const tipo    = rand(d.tipos);
+  const rasgo   = rand(d.rasgos_distintivos);
+  const recurso = rand(d.recursos);
+  const quiere  = rand(d.quieren);
+  const antag   = rand(d.antagonistas_de);
+  const gancho  = rand(d.ganchos);
+  const tam     = rand(d.tamanos);
+  const miembros = Math.floor(Math.random() * (tam.max - tam.min + 1)) + tam.min;
+  const data = { tipo, rasgo, recurso, quiere, antag, gancho, tamano: tam.label, tamano_desc: tam.desc, miembros };
 
   document.getElementById('fac-result').innerHTML = `
     <div class="fac-card">
       <div class="fac-tipo">Un ${tipo}</div>
-      <div class="fac-rows">
-        <div class="fac-row">
-          <div class="fac-key">Rasgo</div>
-          <div class="fac-val">${rasgo}</div>
-        </div>
-        <div class="fac-row">
-          <div class="fac-key">Recurso</div>
-          <div class="fac-val">${recurso}</div>
-        </div>
-        <div class="fac-row">
-          <div class="fac-key">Objetivo</div>
-          <div class="fac-val">${quiere}</div>
-        </div>
-        <div class="fac-row">
-          <div class="fac-key">Antagonista de</div>
-          <div class="fac-val">${antag}</div>
-        </div>
-        <div class="fac-row">
-          <div class="fac-key">Gancho</div>
-          <div class="fac-val">${gancho}</div>
-        </div>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.2rem;">
+        <span style="background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${tam.label} · ${tam.desc}</span>
+        <span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">~${miembros} miembros</span>
       </div>
+      <div class="fac-rows">
+        <div class="fac-row"><div class="fac-key">Rasgo</div><div class="fac-val">${rasgo}</div></div>
+        <div class="fac-row"><div class="fac-key">Recurso</div><div class="fac-val">${recurso}</div></div>
+        <div class="fac-row"><div class="fac-key">Objetivo</div><div class="fac-val">${quiere}</div></div>
+        <div class="fac-row"><div class="fac-key">Antagonista de</div><div class="fac-val">${antag}</div></div>
+        <div class="fac-row"><div class="fac-key">Gancho</div><div class="fac-val">${gancho}</div></div>
+      </div>
+      <button class="save-btn" onclick="saveItem('fac', ${JSON.stringify(data).replace(/"/g, '&quot;')}); this.textContent='✓ Guardado'; this.classList.add('saved')">
+        ✦ Guardar faccion
+      </button>
     </div>`;
 }
 

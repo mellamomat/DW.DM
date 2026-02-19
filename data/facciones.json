@@ -1,67 +1,81 @@
 {
-  "_instrucciones": "El generador combina un tipo base con rasgos, recursos, antagonistas y ganchos para crear facciones únicas en el momento.",
+  "_instrucciones": "El generador combina un tipo base con rasgos, recursos, antagonistas y ganchos. El tamano combina numero estimado con categoria descriptiva.",
+
   "tipos": [
     "gremio de mercaderes", "culto religioso", "orden militar", "banda de forajidos", "consejo de magos",
-    "tribu nómade", "familia noble", "red de espías", "hermandad de asesinos", "facción política urbana",
-    "secta herética", "alianza de aldeas", "guardia corrupta", "refugiados organizados", "cofradía de ladrones"
+    "tribu nomade", "familia noble", "red de espias", "hermandad de asesinos", "faccion politica urbana",
+    "secta heretica", "alianza de aldeas", "guardia corrupta", "refugiados organizados", "cofradia de ladrones"
   ],
+
   "rasgos_distintivos": [
-    "operan siempre a través de intermediarios, nunca dan la cara",
-    "tienen un código de honor rígido que los limita tanto como los define",
-    "su verdadero objetivo es secreto incluso para la mayoría de sus propios miembros",
-    "controlan información más que recursos materiales",
+    "operan siempre a traves de intermediarios, nunca dan la cara",
+    "tienen un codigo de honor rigido que los limita tanto como los define",
+    "su verdadero objetivo es secreto incluso para la mayoria de sus propios miembros",
+    "controlan informacion mas que recursos materiales",
     "su poder viene de una alianza con algo no-humano",
-    "están en proceso de fragmentarse internamente",
-    "tienen presencia en lugares donde nadie los esperaría encontrar",
+    "estan en proceso de fragmentarse internamente",
+    "tienen presencia en lugares donde nadie los esperaria encontrar",
     "su liderazgo es colectivo y descentralizado",
     "deben su poder a un secreto comprometedor que guardan sobre otros",
-    "fueron mucho más poderosos en el pasado y lo saben",
-    "tienen acceso a una ruta o recurso que nadie más controla",
-    "su reputación pública es opuesta a su naturaleza real"
+    "fueron mucho mas poderosos en el pasado y lo saben",
+    "tienen acceso a una ruta o recurso que nadie mas controla",
+    "su reputacion publica es opuesta a su naturaleza real"
   ],
+
   "recursos": [
-    "redes de distribución en múltiples ciudades",
-    "un ejército pequeño pero extremadamente leal",
+    "redes de distribucion en multiples ciudades",
+    "un ejercito pequeno pero extremadamente leal",
     "acceso a magia que otros no pueden obtener",
-    "información sobre casi todos los actores relevantes de la región",
-    "dinero suficiente para comprar favores en el nivel más alto",
-    "control de un paso estratégico o recurso escaso",
-    "la lealtad de la gente común en varios asentamientos",
+    "informacion sobre casi todos los actores relevantes de la region",
+    "dinero suficiente para comprar favores en el nivel mas alto",
+    "control de un paso estrategico o recurso escaso",
+    "la lealtad de la gente comun en varios asentamientos",
     "archivos con secretos de familias nobles y funcionarios",
     "una fortaleza o refugio inexpugnable",
     "aliados en todas las facciones importantes, sin que ninguna lo sepa"
   ],
+
   "quieren": [
     "expandir su influencia al territorio que los PJs frecuentan",
     "recuperar algo que les fue robado o quitado",
-    "eliminar a una facción rival antes de que los eliminen",
+    "eliminar a una faccion rival antes de que los eliminen",
     "mantener el status quo a cualquier costo",
-    "cumplir una profecía o mandato que solo ellos conocen",
-    "acumular suficiente poder para no necesitar a nadie más",
+    "cumplir una profecia o mandato que solo ellos conocen",
+    "acumular suficiente poder para no necesitar a nadie mas",
     "exponer una verdad que alguien poderoso quiere enterrada",
-    "sobrevivir una amenaza que se acerca y que nadie más ve",
-    "encontrar o controlar un objeto o lugar específico",
-    "poner a alguien de los suyos en una posición de poder clave"
+    "sobrevivir una amenaza que se acerca y que nadie mas ve",
+    "encontrar o controlar un objeto o lugar especifico",
+    "poner a alguien de los suyos en una posicion de poder clave"
   ],
+
   "antagonistas_de": [
     "los comerciantes independientes que no pagan tributo",
-    "la facción religiosa dominante",
-    "el gobierno oficial de la ciudad o región",
-    "otra facción de naturaleza similar",
+    "la faccion religiosa dominante",
+    "el gobierno oficial de la ciudad o region",
+    "otra faccion de naturaleza similar",
     "cualquiera que sepa demasiado sobre sus operaciones",
     "los aventureros que se meten donde no los llaman",
-    "una familia específica con historia antigua entre ellos",
-    "los no-humanos de la región",
+    "una familia especifica con historia antigua entre ellos",
+    "los no-humanos de la region",
     "sus propios miembros disidentes"
   ],
+
   "ganchos": [
     "uno de sus agentes fue capturado y sabe demasiado",
     "necesitan a alguien externo para una tarea que sus propios miembros no pueden hacer sin delatarse",
-    "un miembro importante quiere desertar y busca protección",
+    "un miembro importante quiere desertar y busca proteccion",
     "tienen algo que los PJs necesitan, y viceversa",
-    "los confundieron con agentes de esta facción, con o sin razón",
-    "conocen la ubicación de algo que todos buscan",
-    "están a punto de tomar una acción que afectará directamente a alguien que los PJs conocen",
-    "uno de los PJs tiene historia con esta facción, lo sepa o no"
+    "los confundieron con agentes de esta faccion, con o sin razon",
+    "conocen la ubicacion de algo que todos buscan",
+    "estan a punto de tomar una accion que afectara directamente a alguien que los PJs conocen",
+    "uno de los PJs tiene historia con esta faccion, lo sepa o no"
+  ],
+
+  "tamanos": [
+    { "label": "Celula", "desc": "pequena y clandestina", "min": 5, "max": 15 },
+    { "label": "Red", "desc": "distribuida y discreta", "min": 20, "max": 60 },
+    { "label": "Gremio", "desc": "establecido y visible", "min": 50, "max": 150 },
+    { "label": "Orden", "desc": "jerarquica y estructurada", "min": 100, "max": 400 },
+    { "label": "Ejercito", "desc": "masivo y en movimiento", "min": 500, "max": 2000 }
   ]
 }
