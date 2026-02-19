@@ -1,0 +1,67 @@
+{
+  "_instrucciones": "El generador combina un tipo base con rasgos, recursos, antagonistas y ganchos para crear facciones únicas en el momento.",
+  "tipos": [
+    "gremio de mercaderes", "culto religioso", "orden militar", "banda de forajidos", "consejo de magos",
+    "tribu nómade", "familia noble", "red de espías", "hermandad de asesinos", "facción política urbana",
+    "secta herética", "alianza de aldeas", "guardia corrupta", "refugiados organizados", "cofradía de ladrones"
+  ],
+  "rasgos_distintivos": [
+    "operan siempre a través de intermediarios, nunca dan la cara",
+    "tienen un código de honor rígido que los limita tanto como los define",
+    "su verdadero objetivo es secreto incluso para la mayoría de sus propios miembros",
+    "controlan información más que recursos materiales",
+    "su poder viene de una alianza con algo no-humano",
+    "están en proceso de fragmentarse internamente",
+    "tienen presencia en lugares donde nadie los esperaría encontrar",
+    "su liderazgo es colectivo y descentralizado",
+    "deben su poder a un secreto comprometedor que guardan sobre otros",
+    "fueron mucho más poderosos en el pasado y lo saben",
+    "tienen acceso a una ruta o recurso que nadie más controla",
+    "su reputación pública es opuesta a su naturaleza real"
+  ],
+  "recursos": [
+    "redes de distribución en múltiples ciudades",
+    "un ejército pequeño pero extremadamente leal",
+    "acceso a magia que otros no pueden obtener",
+    "información sobre casi todos los actores relevantes de la región",
+    "dinero suficiente para comprar favores en el nivel más alto",
+    "control de un paso estratégico o recurso escaso",
+    "la lealtad de la gente común en varios asentamientos",
+    "archivos con secretos de familias nobles y funcionarios",
+    "una fortaleza o refugio inexpugnable",
+    "aliados en todas las facciones importantes, sin que ninguna lo sepa"
+  ],
+  "quieren": [
+    "expandir su influencia al territorio que los PJs frecuentan",
+    "recuperar algo que les fue robado o quitado",
+    "eliminar a una facción rival antes de que los eliminen",
+    "mantener el status quo a cualquier costo",
+    "cumplir una profecía o mandato que solo ellos conocen",
+    "acumular suficiente poder para no necesitar a nadie más",
+    "exponer una verdad que alguien poderoso quiere enterrada",
+    "sobrevivir una amenaza que se acerca y que nadie más ve",
+    "encontrar o controlar un objeto o lugar específico",
+    "poner a alguien de los suyos en una posición de poder clave"
+  ],
+  "antagonistas_de": [
+    "los comerciantes independientes que no pagan tributo",
+    "la facción religiosa dominante",
+    "el gobierno oficial de la ciudad o región",
+    "otra facción de naturaleza similar",
+    "cualquiera que sepa demasiado sobre sus operaciones",
+    "los aventureros que se meten donde no los llaman",
+    "una familia específica con historia antigua entre ellos",
+    "los no-humanos de la región",
+    "sus propios miembros disidentes"
+  ],
+  "ganchos": [
+    "uno de sus agentes fue capturado y sabe demasiado",
+    "necesitan a alguien externo para una tarea que sus propios miembros no pueden hacer sin delatarse",
+    "un miembro importante quiere desertar y busca protección",
+    "tienen algo que los PJs necesitan, y viceversa",
+    "los confundieron con agentes de esta facción, con o sin razón",
+    "conocen la ubicación de algo que todos buscan",
+    "están a punto de tomar una acción que afectará directamente a alguien que los PJs conocen",
+    "uno de los PJs tiene historia con esta facción, lo sepa o no"
+  ]
+}
