@@ -793,16 +793,31 @@ function renderMovesList() {
     </div>`;
 }
 
+// ═══════════ HELPERS DE UI ═══════════
+const TAG_STYLE = `background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;`;
+const PV_STYLE  = `background:rgba(224,90,75,0.12);border:1px solid rgba(224,90,75,0.3);color:#e05a4b;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;`;
+const RAR_STYLE = `background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;`;
+const PO_STYLE  = `background:rgba(93,190,122,0.1);border:1px solid rgba(93,190,122,0.3);color:#5dbe7a;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;`;
+const TAM_STYLE = `background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;`;
+const KEY_STYLE = `font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);`;
+
+function inp(id, val, placeholder='') {
+  return `<input id="${id}" value="${val.toString().replace(/"/g,'&quot;')}" placeholder="${placeholder}"
+    style="background:rgba(0,0,0,0.3);border:1px solid var(--border-glow);color:var(--text-bright);font-family:'Crimson Pro',serif;font-size:0.95rem;padding:0.3rem 0.5rem;border-radius:2px;width:100%;outline:none;">`;
+}
+function ta(id, val, rows=2) {
+  return `<textarea id="${id}" rows="${rows}"
+    style="background:rgba(0,0,0,0.3);border:1px solid var(--border-glow);color:var(--text-bright);font-family:'Crimson Pro',serif;font-size:0.95rem;padding:0.3rem 0.5rem;border-radius:2px;width:100%;outline:none;resize:vertical;">${val}</textarea>`;
+}
+
 // ═══════════ STORAGE ═══════════
 function getSaved(type) {
   try { return JSON.parse(localStorage.getItem('dw_saved_' + type) || '[]'); }
   catch { return []; }
 }
-
 function setSaved(type, arr) {
   localStorage.setItem('dw_saved_' + type, JSON.stringify(arr));
 }
-
 function saveItem(type, item) {
   const arr = getSaved(type);
   item.id = Date.now();
@@ -810,80 +825,183 @@ function saveItem(type, item) {
   setSaved(type, arr);
   renderSaved(type);
 }
-
 function deleteItem(type, id) {
   const arr = getSaved(type).filter(i => i.id !== id);
   setSaved(type, arr);
   renderSaved(type);
 }
+function updateItem(type, id) {
+  const arr = getSaved(type);
+  const idx = arr.findIndex(i => i.id === id);
+  if (idx === -1) return;
+  const item = arr[idx];
+  // Leer campos según tipo
+  if (type === 'npc') {
+    item.nombre   = document.getElementById(`e_nombre_${id}`).value;
+    item.ocupacion= document.getElementById(`e_ocupacion_${id}`).value;
+    item.pv       = document.getElementById(`e_pv_${id}`).value;
+    item.rasgo    = document.getElementById(`e_rasgo_${id}`).value;
+    item.motiv    = document.getElementById(`e_motiv_${id}`).value;
+    item.actitud  = document.getElementById(`e_actitud_${id}`).value;
+    item.secreto  = document.getElementById(`e_secreto_${id}`).value;
+    item.tags     = document.getElementById(`e_tags_${id}`).value.split(',').map(t=>t.trim()).filter(Boolean);
+  } else if (type === 'obj') {
+    item.nombre     = document.getElementById(`e_nombre_${id}`).value;
+    item.rareza     = document.getElementById(`e_rareza_${id}`).value;
+    item.precio_po  = document.getElementById(`e_precio_${id}`).value;
+    item.descripcion= document.getElementById(`e_desc_${id}`).value;
+    item.gancho     = document.getElementById(`e_gancho_${id}`).value;
+    item.tags       = document.getElementById(`e_tags_${id}`).value.split(',').map(t=>t.trim()).filter(Boolean);
+  } else if (type === 'fac') {
+    item.tipo    = document.getElementById(`e_tipo_${id}`).value;
+    item.tamano  = document.getElementById(`e_tamano_${id}`).value;
+    item.miembros= document.getElementById(`e_miembros_${id}`).value;
+    item.rasgo   = document.getElementById(`e_rasgo_${id}`).value;
+    item.recurso = document.getElementById(`e_recurso_${id}`).value;
+    item.quiere  = document.getElementById(`e_quiere_${id}`).value;
+    item.antag   = document.getElementById(`e_antag_${id}`).value;
+    item.gancho  = document.getElementById(`e_gancho_${id}`).value;
+  }
+  arr[idx] = item;
+  setSaved(type, arr);
+  renderSaved(type);
+}
 
+// ═══════════ RENDER SAVED ═══════════
 function renderSaved(type) {
   const arr = getSaved(type);
   const list = document.getElementById(type + '-saved');
   const count = document.getElementById(type + '-count');
   if (!list) return;
   count.textContent = arr.length;
-
   if (arr.length === 0) {
     list.innerHTML = '<div class="saved-empty">Nada guardado todavía.</div>';
     return;
   }
+  list.innerHTML = arr.map(item => savedItemHTML(type, item, false)).join('');
+}
 
-  list.innerHTML = arr.map(item => {
-    let title = '', sub = '', detail = '';
+function savedItemHTML(type, item, editing) {
+  const id = item.id;
+  let title = '', sub = '', viewHTML = '', editHTML = '';
 
-    if (type === 'npc') {
-      title = item.nombre;
-      sub = item.ocupacion;
-      detail = `
-        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.8rem;">
-          <span style="background:rgba(224,90,75,0.12);border:1px solid rgba(224,90,75,0.3);color:#e05a4b;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${item.pv} PV · ${item.peligrosidad || ''}</span>
-          ${(item.tags||[]).map(t=>`<span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${t}</span>`).join('')}
-        </div>
-        <div style="display:flex;flex-direction:column;gap:0.5rem;">
-          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Apariencia · </span>${item.rasgo}</div>
-          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Quiere · </span>${item.motiv}</div>
-          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Comportamiento · </span>${item.actitud || ''}</div>
-          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Secreto · </span>${item.secreto}</div>
-        </div>`;
-    } else if (type === 'obj') {
-      title = item.nombre;
-      sub = item.categoria;
-      const precioStr = item.precio_po === 0 ? 'Sin valor de mercado' : `~${item.precio_po} po`;
-      detail = `
-        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.8rem;">
-          <span style="background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${item.rareza||''}</span>
-          <span style="background:rgba(93,190,122,0.1);border:1px solid rgba(93,190,122,0.3);color:#5dbe7a;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${precioStr}</span>
-          ${(item.tags||[]).map(t=>`<span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${t}</span>`).join('')}
-        </div>
-        <p>${item.descripcion}</p>${item.gancho ? `<div style="margin-top:0.6rem;padding:0.6rem 0.8rem;background:rgba(0,0,0,0.3);border-left:2px solid var(--border-glow);font-style:italic;color:var(--text-dim);">${item.gancho}</div>` : ''}`;
-    } else if (type === 'fac') {
-      title = 'Un ' + item.tipo;
-      sub = item.rasgo;
-      detail = `
-        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.8rem;">
-          <span style="background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">${item.tamano||''} · ${item.tamano_desc||''}</span>
-          <span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;">~${item.miembros||'?'} miembros</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:0.5rem;">
-          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Recurso · </span>${item.recurso}</div>
-          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Objetivo · </span>${item.quiere}</div>
-          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Antagonista de · </span>${item.antag}</div>
-          <div><span style="font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-dim);">Gancho · </span>${item.gancho}</div>
-        </div>`;
-    }
-
-    return `<div class="saved-item" id="saved-${item.id}">
-      <div class="saved-item-body" onclick="document.getElementById('saved-${item.id}').classList.toggle('open')">
-        <div class="saved-item-title">${title}</div>
-        <div class="saved-item-sub">${sub}</div>
-        <div class="saved-item-detail">${detail}</div>
+  if (type === 'npc') {
+    title = item.nombre;
+    sub   = item.ocupacion;
+    viewHTML = `
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.7rem;">
+        <span style="${PV_STYLE}">${item.pv} PV · ${item.peligrosidad||''}</span>
+        ${(item.tags||[]).map(t=>`<span style="${TAG_STYLE}">${t}</span>`).join('')}
       </div>
-      <div class="saved-item-actions">
-        <button class="del-btn" onclick="deleteItem('${type}', ${item.id})" title="Borrar">✕</button>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        <div><span style="${KEY_STYLE}">Apariencia · </span>${item.rasgo}</div>
+        <div><span style="${KEY_STYLE}">Quiere · </span>${item.motiv}</div>
+        <div><span style="${KEY_STYLE}">Comportamiento · </span>${item.actitud||''}</div>
+        <div><span style="${KEY_STYLE}">Secreto · </span>${item.secreto}</div>
+      </div>`;
+    editHTML = `
+      <div style="display:flex;flex-direction:column;gap:0.7rem;">
+        <div><label style="${KEY_STYLE}">Nombre</label>${inp(`e_nombre_${id}`, item.nombre)}</div>
+        <div><label style="${KEY_STYLE}">Ocupación</label>${inp(`e_ocupacion_${id}`, item.ocupacion)}</div>
+        <div style="display:flex;gap:0.5rem;">
+          <div style="flex:1"><label style="${KEY_STYLE}">PV</label>${inp(`e_pv_${id}`, item.pv)}</div>
+        </div>
+        <div><label style="${KEY_STYLE}">Tags (separados por coma)</label>${inp(`e_tags_${id}`, (item.tags||[]).join(', '))}</div>
+        <div><label style="${KEY_STYLE}">Apariencia</label>${ta(`e_rasgo_${id}`, item.rasgo)}</div>
+        <div><label style="${KEY_STYLE}">Quiere</label>${ta(`e_motiv_${id}`, item.motiv)}</div>
+        <div><label style="${KEY_STYLE}">Comportamiento</label>${ta(`e_actitud_${id}`, item.actitud||'')}</div>
+        <div><label style="${KEY_STYLE}">Secreto</label>${ta(`e_secreto_${id}`, item.secreto)}</div>
+      </div>`;
+  } else if (type === 'obj') {
+    title = item.nombre;
+    sub   = item.categoria;
+    const precioStr = item.precio_po == 0 ? 'Sin valor de mercado' : `~${item.precio_po} po`;
+    viewHTML = `
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.7rem;">
+        <span style="${RAR_STYLE}">${item.rareza||''}</span>
+        <span style="${PO_STYLE}">${precioStr}</span>
+        ${(item.tags||[]).map(t=>`<span style="${TAG_STYLE}">${t}</span>`).join('')}
       </div>
-    </div>`;
-  }).join('');
+      <div>${item.descripcion}</div>
+      ${item.gancho?`<div style="margin-top:0.6rem;padding:0.5rem 0.8rem;background:rgba(0,0,0,0.3);border-left:2px solid var(--border-glow);font-style:italic;color:var(--text-dim);">${item.gancho}</div>`:''}`;
+    editHTML = `
+      <div style="display:flex;flex-direction:column;gap:0.7rem;">
+        <div><label style="${KEY_STYLE}">Nombre</label>${inp(`e_nombre_${id}`, item.nombre)}</div>
+        <div style="display:flex;gap:0.5rem;">
+          <div style="flex:1"><label style="${KEY_STYLE}">Rareza</label>${inp(`e_rareza_${id}`, item.rareza||'')}</div>
+          <div style="flex:1"><label style="${KEY_STYLE}">Precio (po)</label>${inp(`e_precio_${id}`, item.precio_po||0)}</div>
+        </div>
+        <div><label style="${KEY_STYLE}">Tags (separados por coma)</label>${inp(`e_tags_${id}`, (item.tags||[]).join(', '))}</div>
+        <div><label style="${KEY_STYLE}">Descripción</label>${ta(`e_desc_${id}`, item.descripcion, 3)}</div>
+        <div><label style="${KEY_STYLE}">Gancho narrativo</label>${ta(`e_gancho_${id}`, item.gancho||'')}</div>
+      </div>`;
+  } else if (type === 'fac') {
+    title = 'Un ' + item.tipo;
+    sub   = item.rasgo;
+    viewHTML = `
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.7rem;">
+        <span style="${TAM_STYLE}">${item.tamano||''} · ${item.tamano_desc||''}</span>
+        <span style="${TAG_STYLE}">~${item.miembros||'?'} miembros</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        <div><span style="${KEY_STYLE}">Recurso · </span>${item.recurso}</div>
+        <div><span style="${KEY_STYLE}">Objetivo · </span>${item.quiere}</div>
+        <div><span style="${KEY_STYLE}">Antagonista de · </span>${item.antag}</div>
+        <div><span style="${KEY_STYLE}">Gancho · </span>${item.gancho}</div>
+      </div>`;
+    editHTML = `
+      <div style="display:flex;flex-direction:column;gap:0.7rem;">
+        <div><label style="${KEY_STYLE}">Tipo</label>${inp(`e_tipo_${id}`, item.tipo)}</div>
+        <div style="display:flex;gap:0.5rem;">
+          <div style="flex:1"><label style="${KEY_STYLE}">Tamaño</label>${inp(`e_tamano_${id}`, item.tamano||'')}</div>
+          <div style="flex:1"><label style="${KEY_STYLE}">Miembros (~)</label>${inp(`e_miembros_${id}`, item.miembros||'')}</div>
+        </div>
+        <div><label style="${KEY_STYLE}">Rasgo distintivo</label>${ta(`e_rasgo_${id}`, item.rasgo)}</div>
+        <div><label style="${KEY_STYLE}">Recurso</label>${ta(`e_recurso_${id}`, item.recurso)}</div>
+        <div><label style="${KEY_STYLE}">Objetivo</label>${ta(`e_quiere_${id}`, item.quiere)}</div>
+        <div><label style="${KEY_STYLE}">Antagonista de</label>${ta(`e_antag_${id}`, item.antag)}</div>
+        <div><label style="${KEY_STYLE}">Gancho</label>${ta(`e_gancho_${id}`, item.gancho)}</div>
+      </div>`;
+  }
+
+  return `<div class="saved-item ${editing ? 'open' : ''}" id="saved-${id}">
+    <div class="saved-item-body" onclick="if(!event.target.closest('input,textarea,button'))document.getElementById('saved-${id}').classList.toggle('open')">
+      <div class="saved-item-title">${editing ? title : title}</div>
+      <div class="saved-item-sub">${sub}</div>
+      <div class="saved-item-detail">
+        <div id="view-${id}" style="${editing?'display:none':''}">
+          ${viewHTML}
+          <button class="save-btn" style="margin-top:0.8rem;" onclick="event.stopPropagation();startEditSaved('${type}',${id})">✎ Editar</button>
+        </div>
+        <div id="edit-${id}" style="${editing?'':'display:none'}">
+          ${editHTML}
+          <div style="display:flex;gap:0.5rem;margin-top:0.8rem;">
+            <button class="save-btn" onclick="event.stopPropagation();updateItem('${type}',${id})">✓ Guardar cambios</button>
+            <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="event.stopPropagation();cancelEditSaved('${type}',${id})">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="saved-item-actions">
+      <button class="del-btn" onclick="event.stopPropagation();deleteItem('${type}',${id})" title="Borrar">✕</button>
+    </div>
+  </div>`;
+}
+
+function startEditSaved(type, id) {
+  const arr = getSaved(type);
+  const item = arr.find(i => i.id === id);
+  if (!item) return;
+  const el = document.getElementById('saved-' + id);
+  el.classList.add('open');
+  el.querySelector('#view-' + id).style.display = 'none';
+  el.querySelector('#edit-' + id).style.display = 'block';
+}
+
+function cancelEditSaved(type, id) {
+  const el = document.getElementById('saved-' + id);
+  el.querySelector('#view-' + id).style.display = '';
+  el.querySelector('#edit-' + id).style.display = 'none';
 }
 
 function initSaved() {
@@ -892,7 +1010,50 @@ function initSaved() {
   renderSaved('fac');
 }
 
+// ═══════════ CURRENT ITEM STATE (para editar el generado) ═══════════
+let currentGenerated = { npc: null, obj: null, fac: null };
+
 // ═══════════ NPC GENERATOR ═══════════
+function renderNPCCard(data, editMode) {
+  const tagsHtml = (data.tags||[]).map(t=>`<span style="${TAG_STYLE}">${t}</span>`).join('');
+  const viewContent = `
+    <div class="npc-name">${data.nombre}</div>
+    <div class="npc-occ">${data.ocupacion}</div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <span style="${PV_STYLE}">${data.pv} PV · ${data.peligrosidad||''}</span>
+      ${tagsHtml}
+    </div>
+    <div class="npc-rows">
+      <div class="npc-row"><div class="npc-key">Apariencia</div><div class="npc-val">${data.rasgo}</div></div>
+      <div class="npc-row"><div class="npc-key">Quiere</div><div class="npc-val">${data.motiv}</div></div>
+      <div class="npc-row"><div class="npc-key">Comportamiento</div><div class="npc-val">${data.actitud||''}</div></div>
+      <div class="npc-row"><div class="npc-key">Secreto</div><div class="npc-val">${data.secreto}</div></div>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+      <button class="save-btn" onclick="saveCurrentNPC()">✦ Guardar NPC</button>
+      <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="editCurrentNPC()">✎ Editar</button>
+    </div>`;
+  const editContent = `
+    <div style="display:flex;flex-direction:column;gap:0.7rem;">
+      <div><label style="${KEY_STYLE}">Nombre</label>${inp('gen_nombre', data.nombre)}</div>
+      <div><label style="${KEY_STYLE}">Ocupación</label>${inp('gen_ocupacion', data.ocupacion)}</div>
+      <div style="display:flex;gap:0.5rem;">
+        <div style="flex:1"><label style="${KEY_STYLE}">PV</label>${inp('gen_pv', data.pv)}</div>
+      </div>
+      <div><label style="${KEY_STYLE}">Tags (separados por coma)</label>${inp('gen_tags', (data.tags||[]).join(', '))}</div>
+      <div><label style="${KEY_STYLE}">Apariencia</label>${ta('gen_rasgo', data.rasgo)}</div>
+      <div><label style="${KEY_STYLE}">Quiere</label>${ta('gen_motiv', data.motiv)}</div>
+      <div><label style="${KEY_STYLE}">Comportamiento</label>${ta('gen_actitud', data.actitud||'')}</div>
+      <div><label style="${KEY_STYLE}">Secreto</label>${ta('gen_secreto', data.secreto)}</div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.3rem;flex-wrap:wrap;">
+        <button class="save-btn" onclick="applyEditNPC()">✓ Aplicar cambios</button>
+        <button class="save-btn" onclick="saveCurrentNPC()">✦ Guardar NPC</button>
+        <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="renderNPCCard(currentGenerated.npc, false);document.getElementById('npc-result').innerHTML=lastNPCHTML;">Cancelar</button>
+      </div>
+    </div>`;
+  document.getElementById('npc-result').innerHTML = `<div class="npc-card">${editMode ? editContent : viewContent}</div>`;
+}
+
 function genNPC() {
   const d = DATA.npcs;
   const allNames = [...d.nombres_masc, ...d.nombres_fem, ...d.nombres_neutros];
@@ -902,36 +1063,33 @@ function genNPC() {
   const motiv     = rand(d.motivaciones);
   const secreto   = rand(d.secretos);
   const actitud   = rand(d.actitudes);
-
-  // PV segun categoria aleatoria
   const cat = rand(d.categorias_peligrosidad);
   const pv  = Math.floor(Math.random() * (cat.pv_max - cat.pv_min + 1)) + cat.pv_min;
-
-  // 2-3 tags al azar sin repetir
   const shuffled = [...d.tags].sort(() => Math.random() - 0.5);
-  const nTags = 2 + Math.floor(Math.random() * 2); // 2 o 3
-  const tags  = shuffled.slice(0, nTags);
+  const tags = shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
+  currentGenerated.npc = { nombre, ocupacion, rasgo, motiv, secreto, actitud, pv, peligrosidad: cat.label, tags };
+  renderNPCCard(currentGenerated.npc, false);
+}
 
-  const data = { nombre, ocupacion, rasgo, motiv, secreto, actitud, pv, peligrosidad: cat.label, tags };
+function editCurrentNPC() { renderNPCCard(currentGenerated.npc, true); }
 
-  document.getElementById('npc-result').innerHTML = `
-    <div class="npc-card">
-      <div class="npc-name">${nombre}</div>
-      <div class="npc-occ">${ocupacion}</div>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
-        <span style="background:rgba(224,90,75,0.12);border:1px solid rgba(224,90,75,0.3);color:#e05a4b;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${pv} PV · ${cat.label}</span>
-        ${tags.map(t => `<span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${t}</span>`).join('')}
-      </div>
-      <div class="npc-rows">
-        <div class="npc-row"><div class="npc-key">Apariencia</div><div class="npc-val">${rasgo}</div></div>
-        <div class="npc-row"><div class="npc-key">Quiere</div><div class="npc-val">${motiv}</div></div>
-        <div class="npc-row"><div class="npc-key">Comportamiento</div><div class="npc-val">${actitud}</div></div>
-        <div class="npc-row"><div class="npc-key">Secreto</div><div class="npc-val">${secreto}</div></div>
-      </div>
-      <button class="save-btn" onclick="saveItem('npc', ${JSON.stringify(data).replace(/"/g, '&quot;')}); this.textContent='✓ Guardado'; this.classList.add('saved')">
-        ✦ Guardar NPC
-      </button>
-    </div>`;
+function applyEditNPC() {
+  currentGenerated.npc.nombre    = document.getElementById('gen_nombre').value;
+  currentGenerated.npc.ocupacion = document.getElementById('gen_ocupacion').value;
+  currentGenerated.npc.pv        = document.getElementById('gen_pv').value;
+  currentGenerated.npc.rasgo     = document.getElementById('gen_rasgo').value;
+  currentGenerated.npc.motiv     = document.getElementById('gen_motiv').value;
+  currentGenerated.npc.actitud   = document.getElementById('gen_actitud').value;
+  currentGenerated.npc.secreto   = document.getElementById('gen_secreto').value;
+  currentGenerated.npc.tags      = document.getElementById('gen_tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  renderNPCCard(currentGenerated.npc, false);
+}
+
+function saveCurrentNPC() {
+  if (!currentGenerated.npc) return;
+  const data = Object.assign({}, currentGenerated.npc);
+  saveItem('npc', data);
+  document.querySelectorAll('#npc-result .save-btn').forEach(b => { if(b.textContent.includes('Guardar')){ b.textContent='✓ Guardado'; b.classList.add('saved'); }});
 }
 
 // ═══════════ OBJETO GENERATOR ═══════════
@@ -952,36 +1110,108 @@ function selectObjCat(id, btn) {
   btn.classList.add('active');
 }
 
+function renderObjCard(data, editMode) {
+  const precioStr = data.precio_po == 0 ? 'Sin valor de mercado' : `~${data.precio_po} po`;
+  const tagsHtml = (data.tags||[]).map(t=>`<span style="${TAG_STYLE}">${t}</span>`).join('');
+  const viewContent = `
+    <div class="obj-tipo">${data.categoria}</div>
+    <div class="obj-nombre">${data.nombre}</div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <span style="${RAR_STYLE}">${data.rareza||''}</span>
+      <span style="${PO_STYLE}">${precioStr}</span>
+      ${tagsHtml}
+    </div>
+    <div class="obj-desc">${data.descripcion}</div>
+    ${data.gancho?`<div class="obj-gancho">${data.gancho}</div>`:''}
+    <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+      <button class="save-btn" onclick="saveCurrentObj()">✦ Guardar objeto</button>
+      <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="editCurrentObj()">✎ Editar</button>
+    </div>`;
+  const editContent = `
+    <div style="display:flex;flex-direction:column;gap:0.7rem;">
+      <div><label style="${KEY_STYLE}">Nombre</label>${inp('gen_o_nombre', data.nombre)}</div>
+      <div style="display:flex;gap:0.5rem;">
+        <div style="flex:1"><label style="${KEY_STYLE}">Rareza</label>${inp('gen_o_rareza', data.rareza||'')}</div>
+        <div style="flex:1"><label style="${KEY_STYLE}">Precio (po)</label>${inp('gen_o_precio', data.precio_po||0)}</div>
+      </div>
+      <div><label style="${KEY_STYLE}">Tags (separados por coma)</label>${inp('gen_o_tags', (data.tags||[]).join(', '))}</div>
+      <div><label style="${KEY_STYLE}">Descripción</label>${ta('gen_o_desc', data.descripcion, 3)}</div>
+      <div><label style="${KEY_STYLE}">Gancho narrativo</label>${ta('gen_o_gancho', data.gancho||'')}</div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.3rem;flex-wrap:wrap;">
+        <button class="save-btn" onclick="applyEditObj()">✓ Aplicar cambios</button>
+        <button class="save-btn" onclick="saveCurrentObj()">✦ Guardar objeto</button>
+        <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="renderObjCard(currentGenerated.obj,false)">Cancelar</button>
+      </div>
+    </div>`;
+  document.getElementById('obj-result').innerHTML = `<div class="obj-card">${editMode ? editContent : viewContent}</div>`;
+}
+
 function genObjeto() {
   const cat = DATA.objetos.categorias.find(c => c.id === selectedObjCat);
   if (!cat) return;
   const item = rand(cat.items);
-  const data = { nombre: item.nombre, categoria: cat.label, descripcion: item.descripcion, gancho: item.gancho || '', rareza: item.rareza, precio_po: item.precio_po, tags: item.tags };
+  currentGenerated.obj = { nombre: item.nombre, categoria: cat.label, descripcion: item.descripcion, gancho: item.gancho||'', rareza: item.rareza, precio_po: item.precio_po, tags: item.tags };
+  renderObjCard(currentGenerated.obj, false);
+}
 
-  const tagsHtml = (item.tags || []).map(t =>
-    `<span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${t}</span>`
-  ).join('');
+function editCurrentObj() { renderObjCard(currentGenerated.obj, true); }
 
-  const precioStr = item.precio_po === 0 ? 'Sin valor de mercado' : `~${item.precio_po} po`;
+function applyEditObj() {
+  currentGenerated.obj.nombre      = document.getElementById('gen_o_nombre').value;
+  currentGenerated.obj.rareza      = document.getElementById('gen_o_rareza').value;
+  currentGenerated.obj.precio_po   = document.getElementById('gen_o_precio').value;
+  currentGenerated.obj.descripcion = document.getElementById('gen_o_desc').value;
+  currentGenerated.obj.gancho      = document.getElementById('gen_o_gancho').value;
+  currentGenerated.obj.tags        = document.getElementById('gen_o_tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  renderObjCard(currentGenerated.obj, false);
+}
 
-  document.getElementById('obj-result').innerHTML = `
-    <div class="obj-card">
-      <div class="obj-tipo">${cat.label}</div>
-      <div class="obj-nombre">${item.nombre}</div>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;">
-        <span style="background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${item.rareza}</span>
-        <span style="background:rgba(93,190,122,0.1);border:1px solid rgba(93,190,122,0.3);color:#5dbe7a;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${precioStr}</span>
-        ${tagsHtml}
-      </div>
-      <div class="obj-desc">${item.descripcion}</div>
-      ${item.gancho ? `<div class="obj-gancho">${item.gancho}</div>` : ''}
-      <button class="save-btn" onclick="saveItem('obj', ${JSON.stringify(data).replace(/"/g, '&quot;')}); this.textContent='✓ Guardado'; this.classList.add('saved')">
-        ✦ Guardar objeto
-      </button>
-    </div>`;
+function saveCurrentObj() {
+  if (!currentGenerated.obj) return;
+  saveItem('obj', Object.assign({}, currentGenerated.obj));
+  document.querySelectorAll('#obj-result .save-btn').forEach(b => { if(b.textContent.includes('Guardar')){ b.textContent='✓ Guardado'; b.classList.add('saved'); }});
 }
 
 // ═══════════ FACCION GENERATOR ═══════════
+function renderFacCard(data, editMode) {
+  const viewContent = `
+    <div class="fac-tipo">Un ${data.tipo}</div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.2rem;">
+      <span style="${TAM_STYLE}">${data.tamano||''} · ${data.tamano_desc||''}</span>
+      <span style="${TAG_STYLE}">~${data.miembros||'?'} miembros</span>
+    </div>
+    <div class="fac-rows">
+      <div class="fac-row"><div class="fac-key">Rasgo</div><div class="fac-val">${data.rasgo}</div></div>
+      <div class="fac-row"><div class="fac-key">Recurso</div><div class="fac-val">${data.recurso}</div></div>
+      <div class="fac-row"><div class="fac-key">Objetivo</div><div class="fac-val">${data.quiere}</div></div>
+      <div class="fac-row"><div class="fac-key">Antagonista de</div><div class="fac-val">${data.antag}</div></div>
+      <div class="fac-row"><div class="fac-key">Gancho</div><div class="fac-val">${data.gancho}</div></div>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+      <button class="save-btn" onclick="saveCurrentFac()">✦ Guardar facción</button>
+      <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="editCurrentFac()">✎ Editar</button>
+    </div>`;
+  const editContent = `
+    <div style="display:flex;flex-direction:column;gap:0.7rem;">
+      <div><label style="${KEY_STYLE}">Tipo</label>${inp('gen_f_tipo', data.tipo)}</div>
+      <div style="display:flex;gap:0.5rem;">
+        <div style="flex:1"><label style="${KEY_STYLE}">Tamaño</label>${inp('gen_f_tamano', data.tamano||'')}</div>
+        <div style="flex:1"><label style="${KEY_STYLE}">Miembros (~)</label>${inp('gen_f_miembros', data.miembros||'')}</div>
+      </div>
+      <div><label style="${KEY_STYLE}">Rasgo distintivo</label>${ta('gen_f_rasgo', data.rasgo)}</div>
+      <div><label style="${KEY_STYLE}">Recurso</label>${ta('gen_f_recurso', data.recurso)}</div>
+      <div><label style="${KEY_STYLE}">Objetivo</label>${ta('gen_f_quiere', data.quiere)}</div>
+      <div><label style="${KEY_STYLE}">Antagonista de</label>${ta('gen_f_antag', data.antag)}</div>
+      <div><label style="${KEY_STYLE}">Gancho</label>${ta('gen_f_gancho', data.gancho)}</div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.3rem;flex-wrap:wrap;">
+        <button class="save-btn" onclick="applyEditFac()">✓ Aplicar cambios</button>
+        <button class="save-btn" onclick="saveCurrentFac()">✦ Guardar facción</button>
+        <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="renderFacCard(currentGenerated.fac,false)">Cancelar</button>
+      </div>
+    </div>`;
+  document.getElementById('fac-result').innerHTML = `<div class="fac-card">${editMode ? editContent : viewContent}</div>`;
+}
+
 function genFaccion() {
   const d = DATA.facciones;
   const tipo    = rand(d.tipos);
@@ -992,26 +1222,28 @@ function genFaccion() {
   const gancho  = rand(d.ganchos);
   const tam     = rand(d.tamanos);
   const miembros = Math.floor(Math.random() * (tam.max - tam.min + 1)) + tam.min;
-  const data = { tipo, rasgo, recurso, quiere, antag, gancho, tamano: tam.label, tamano_desc: tam.desc, miembros };
+  currentGenerated.fac = { tipo, rasgo, recurso, quiere, antag, gancho, tamano: tam.label, tamano_desc: tam.desc, miembros };
+  renderFacCard(currentGenerated.fac, false);
+}
 
-  document.getElementById('fac-result').innerHTML = `
-    <div class="fac-card">
-      <div class="fac-tipo">Un ${tipo}</div>
-      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.2rem;">
-        <span style="background:rgba(91,159,214,0.1);border:1px solid rgba(91,159,214,0.3);color:#5b9fd6;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">${tam.label} · ${tam.desc}</span>
-        <span style="background:rgba(201,168,76,0.08);border:1px solid var(--border);color:var(--text-dim);font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;">~${miembros} miembros</span>
-      </div>
-      <div class="fac-rows">
-        <div class="fac-row"><div class="fac-key">Rasgo</div><div class="fac-val">${rasgo}</div></div>
-        <div class="fac-row"><div class="fac-key">Recurso</div><div class="fac-val">${recurso}</div></div>
-        <div class="fac-row"><div class="fac-key">Objetivo</div><div class="fac-val">${quiere}</div></div>
-        <div class="fac-row"><div class="fac-key">Antagonista de</div><div class="fac-val">${antag}</div></div>
-        <div class="fac-row"><div class="fac-key">Gancho</div><div class="fac-val">${gancho}</div></div>
-      </div>
-      <button class="save-btn" onclick="saveItem('fac', ${JSON.stringify(data).replace(/"/g, '&quot;')}); this.textContent='✓ Guardado'; this.classList.add('saved')">
-        ✦ Guardar faccion
-      </button>
-    </div>`;
+function editCurrentFac() { renderFacCard(currentGenerated.fac, true); }
+
+function applyEditFac() {
+  currentGenerated.fac.tipo     = document.getElementById('gen_f_tipo').value;
+  currentGenerated.fac.tamano   = document.getElementById('gen_f_tamano').value;
+  currentGenerated.fac.miembros = document.getElementById('gen_f_miembros').value;
+  currentGenerated.fac.rasgo    = document.getElementById('gen_f_rasgo').value;
+  currentGenerated.fac.recurso  = document.getElementById('gen_f_recurso').value;
+  currentGenerated.fac.quiere   = document.getElementById('gen_f_quiere').value;
+  currentGenerated.fac.antag    = document.getElementById('gen_f_antag').value;
+  currentGenerated.fac.gancho   = document.getElementById('gen_f_gancho').value;
+  renderFacCard(currentGenerated.fac, false);
+}
+
+function saveCurrentFac() {
+  if (!currentGenerated.fac) return;
+  saveItem('fac', Object.assign({}, currentGenerated.fac));
+  document.querySelectorAll('#fac-result .save-btn').forEach(b => { if(b.textContent.includes('Guardar')){ b.textContent='✓ Guardado'; b.classList.add('saved'); }});
 }
 
 // ═══════════ NAV ═══════════
