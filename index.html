@@ -701,7 +701,7 @@
 
 <script>
 // ═══════════ STATE ═══════════
-let DATA = { moves: null, npcs: null, objetos: null, facciones: null };
+let DATA = { moves: null, npcs: null, objetos: null, facciones: null, armas: null };
 let selectedSit = null;
 let selectedSev = null;
 let selectedObjCat = null;
@@ -718,30 +718,47 @@ async function loadJSON(path) {
   return res.json();
 }
 
+async function loadJSONSafe(path) {
+  try {
+    const res = await fetch(path);
+    if (!res.ok) return null;
+    return res.json();
+  } catch(e) {
+    return null;
+  }
+}
+
 async function loadAll() {
   try {
     const [moves, npcs, objetos, facciones, armas] = await Promise.all([
-      loadJSON('data/moves.json'),
-      loadJSON('data/npcs.json'),
-      loadJSON('data/objetos.json'),
-      loadJSON('data/facciones.json'),
-      loadJSON('data/armas.json')
+      loadJSONSafe('data/moves.json'),
+      loadJSONSafe('data/npcs.json'),
+      loadJSONSafe('data/objetos.json'),
+      loadJSONSafe('data/facciones.json'),
+      loadJSONSafe('data/armas.json')
     ]);
-    DATA.moves = moves;
-    DATA.npcs = npcs;
-    DATA.objetos = objetos;
+
+    DATA.moves     = moves;
+    DATA.npcs      = npcs;
+    DATA.objetos   = objetos;
     DATA.facciones = facciones;
-    DATA.armas = armas;
-    initMoves();
-    initObjCats();
-    initArmaSelectors();
+    DATA.armas     = armas;
+
+    if (DATA.moves)     initMoves();
+    else document.getElementById('moves-content').innerHTML =
+      '<div class="loading" style="color:var(--red)">Error cargando moves.json</div>';
+
+    if (DATA.objetos)   initObjCats();
+    if (DATA.armas)     initArmaSelectors();
+    else document.getElementById('arma-selectors').innerHTML =
+      '<div class="loading" style="color:var(--red)">Error cargando armas.json — subí el archivo a /data</div>';
+
     initSaved();
   } catch(e) {
-    document.getElementById('moves-content').innerHTML =
-      '<div class="loading" style="color:var(--red)">Error cargando datos. Verificá que los archivos JSON estén en la carpeta /data.</div>';
     console.error(e);
+    document.getElementById('moves-content').innerHTML =
+      '<div class="loading" style="color:var(--red)">Error inesperado al cargar datos.</div>';
   }
-}
 
 // ═══════════ MOVES ═══════════
 function initMoves() {
