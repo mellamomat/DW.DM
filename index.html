@@ -759,6 +759,7 @@ async function loadAll() {
     document.getElementById('moves-content').innerHTML =
       '<div class="loading" style="color:var(--red)">Error inesperado al cargar datos.</div>';
   }
+}
 
 // ═══════════ MOVES ═══════════
 function initMoves() {
@@ -893,7 +894,6 @@ function updateItem(type, id) {
     item.quiere  = document.getElementById(`e_quiere_${id}`).value;
     item.antag   = document.getElementById(`e_antag_${id}`).value;
     item.gancho  = document.getElementById(`e_gancho_${id}`).value;
-  }
   } else if (type === 'arma') {
     item.nombre      = document.getElementById(`e_nombre_${id}`).value;
     item.rareza      = document.getElementById(`e_rareza_${id}`).value;
