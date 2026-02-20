@@ -1,0 +1,125 @@
+{
+  "_instrucciones": "El generador combina tipo + rareza + tags opcionales con listas de prefijos, materiales, efectos y ganchos para crear armas únicas.",
+
+  "tipos": [
+    {
+      "id": "espada_corta", "label": "Espada corta",
+      "base_dano": "1d6", "alcance": "cercano", "manos": 1,
+      "precio_base": { "comun": 20, "poco_comun": 80, "raro": 250, "muy_raro": 600, "legendario": 2000 },
+      "partes": ["hoja", "filo", "acero", "daga larga"]
+    },
+    {
+      "id": "espada_larga", "label": "Espada larga",
+      "base_dano": "1d8", "alcance": "cercano", "manos": 1,
+      "precio_base": { "comun": 30, "poco_comun": 120, "raro": 350, "muy_raro": 900, "legendario": 3000 },
+      "partes": ["hoja", "filo", "espada", "sable"]
+    },
+    {
+      "id": "espadon", "label": "Espadón (2 manos)",
+      "base_dano": "1d10", "alcance": "cercano", "manos": 2,
+      "precio_base": { "comun": 50, "poco_comun": 180, "raro": 500, "muy_raro": 1200, "legendario": 4000 },
+      "partes": ["hoja", "acero", "corte", "filo"]
+    },
+    {
+      "id": "hacha", "label": "Hacha de mano",
+      "base_dano": "1d6", "alcance": "cercano", "manos": 1,
+      "precio_base": { "comun": 20, "poco_comun": 80, "raro": 250, "muy_raro": 600, "legendario": 2000 },
+      "partes": ["hoja", "corte", "filo", "tajo"]
+    },
+    {
+      "id": "hacha_guerra", "label": "Hacha de guerra (2 manos)",
+      "base_dano": "1d10", "alcance": "cercano", "manos": 2,
+      "precio_base": { "comun": 50, "poco_comun": 180, "raro": 500, "muy_raro": 1200, "legendario": 4000 },
+      "partes": ["tajo", "corte", "hacha", "filo"]
+    },
+    {
+      "id": "daga", "label": "Daga",
+      "base_dano": "1d4", "alcance": "cercano/lejano", "manos": 1,
+      "precio_base": { "comun": 10, "poco_comun": 50, "raro": 180, "muy_raro": 450, "legendario": 1500 },
+      "partes": ["hoja", "filo", "aguja", "colmillo"]
+    },
+    {
+      "id": "lanza", "label": "Lanza",
+      "base_dano": "1d6", "alcance": "cercano/lejano", "manos": 1,
+      "precio_base": { "comun": 15, "poco_comun": 70, "raro": 220, "muy_raro": 550, "legendario": 1800 },
+      "partes": ["punta", "asta", "lanza", "colmillo"]
+    },
+    {
+      "id": "arco", "label": "Arco",
+      "base_dano": "1d6", "alcance": "lejano", "manos": 2,
+      "precio_base": { "comun": 25, "poco_comun": 100, "raro": 300, "muy_raro": 750, "legendario": 2500 },
+      "partes": ["arco", "cuerda", "rama", "curva"]
+    },
+    {
+      "id": "ballesta", "label": "Ballesta",
+      "base_dano": "1d8", "alcance": "lejano", "manos": 2,
+      "precio_base": { "comun": 35, "poco_comun": 130, "raro": 380, "muy_raro": 850, "legendario": 2800 },
+      "partes": ["ballesta", "arco", "mecanismo", "cuerda"]
+    },
+    {
+      "id": "maza", "label": "Maza",
+      "base_dano": "1d6", "alcance": "cercano", "manos": 1,
+      "precio_base": { "comun": 20, "poco_comun": 80, "raro": 250, "muy_raro": 600, "legendario": 2000 },
+      "partes": ["cabeza", "maza", "golpe", "martillo"]
+    },
+    {
+      "id": "baston", "label": "Bastón mágico",
+      "base_dano": "1d6", "alcance": "cercano", "manos": 2,
+      "precio_base": { "comun": 30, "poco_comun": 150, "raro": 450, "muy_raro": 1100, "legendario": 3500 },
+      "partes": ["vara", "bastón", "rama", "foco"]
+    }
+  ],
+
+  "rarezas": [
+    { "id": "comun",      "label": "Común",       "bonus_dano": "",      "n_efectos": 0, "n_ganchos": 0 },
+    { "id": "poco_comun", "label": "Poco común",   "bonus_dano": "",      "n_efectos": 1, "n_ganchos": 0 },
+    { "id": "raro",       "label": "Raro",          "bonus_dano": "+1",    "n_efectos": 1, "n_ganchos": 1 },
+    { "id": "muy_raro",   "label": "Muy raro",      "bonus_dano": "+2",    "n_efectos": 2, "n_ganchos": 1 },
+    { "id": "legendario", "label": "Legendario",    "bonus_dano": "+3",    "n_efectos": 2, "n_ganchos": 2 }
+  ],
+
+  "tags_opcionales": [
+    { "id": "fuego",    "label": "🔥 Ígneo",      "prefijos": ["Brasas de", "Llama de", "Ceniza de", "Furia de", "Ascua de"],     "sufijos": ["ardiente", "de las llamas", "volcánico", "del fénix", "solar"],     "materiales": ["acero volcánico", "hierro de meteoro", "aleación ígnea", "metal brasero"],         "efectos": ["+1 daño vs criaturas de hielo", "ilumina como antorcha al desenvainarse", "quema objetos inflamables al contacto", "el portador no siente el frío extremo"] },
+    { "id": "hielo",    "label": "❄️ Gélido",     "prefijos": ["Escarcha de", "Ventisca de", "Glaciar de", "Silencio de", "Frío de"], "sufijos": ["glacial", "del invierno eterno", "de la tundra", "del norte", "helado"],  "materiales": ["acero del norte", "hierro glacial", "cristal de hielo petrificado", "metal del invierno"], "efectos": ["+1 daño vs criaturas de fuego", "puede congelar agua al contacto", "heridas causan entumecimiento leve", "el portador resiste el calor extremo"] },
+    { "id": "veneno",   "label": "☠️ Venenoso",   "prefijos": ["Colmillo de", "Ponzoña de", "Víbora de", "Sombra de", "Hiel de"],  "sufijos": ["ponzoñoso", "de la serpiente", "del pantano", "venenoso", "tóxico"],  "materiales": ["acero oscuro", "hierro negro", "metal corrosivo", "aleación corrupta"],              "efectos": ["heridas menores se infectan sin tratamiento", "+1 daño adicional en el próximo turno", "causa náuseas en criaturas pequeñas", "veneno puede afectar a quienes lo portan sin cuidado"] },
+    { "id": "sagrado",  "label": "✨ Sagrado",     "prefijos": ["Alba de", "Luz de", "Gracia de", "Juicio de", "Pureza de"],       "sufijos": ["sagrado", "del amanecer", "celestial", "bendito", "divino"],          "materiales": ["plata bendita", "acero consagrado", "metal purificado", "aleación celestial"],       "efectos": ["+1 daño vs no-muertos y demonios", "brilla levemente ante el mal cercano", "no puede ser empuñado por quienes actuaron de mala fe", "heridas curadas por este filo no se infectan"] },
+    { "id": "maldito",  "label": "💀 Maldito",    "prefijos": ["Sombra de", "Lamento de", "Agonía de", "Maldición de", "Vacío de"], "sufijos": ["maldito", "del abismo", "corrupto", "de las sombras", "sombrío"],    "materiales": ["hierro corrompido", "acero sombrío", "metal del más allá", "aleación oscura"],        "efectos": ["hace 1 daño al portador al desenfundarlo", "+2 daño pero atrae mala suerte", "no-muertos menores lo ignoran", "quien lo use en combate tiene pesadillas esa noche"] },
+    { "id": "arcano",   "label": "🔮 Arcano",     "prefijos": ["Runa de", "Arcano de", "Misterio de", "Eco de", "Conjuro de"],    "sufijos": ["arcano", "del mago", "rúnico", "encantado", "del hechicero"],        "materiales": ["acero runeado", "metal encantado", "aleación arcana", "hierro de ley"],              "efectos": ["puede usarse como foco para conjuros", "brilla al detectar magia cercana", "los conjuros lanzados con él cuestan -1 de carga", "recuerda el último hechizo lanzado en su presencia"] },
+    { "id": "veloz",    "label": "⚡ Veloz",       "prefijos": ["Rayo de", "Viento de", "Destello de", "Suspiro de", "Ráfaga de"], "sufijos": ["veloz", "del viento", "ligero", "ágil", "fugaz"],                    "materiales": ["acero ligero", "aleación hueca", "metal aerado", "hierro liviano"],                  "efectos": ["ignorás la penalización por atacar primero", "podés atacar dos veces con él en un turno una vez por escena", "+1 a tiradas de Desafiar al Peligro que impliquen velocidad"] },
+    { "id": "pesado",   "label": "🪨 Pesado",     "prefijos": ["Roca de", "Titan de", "Carga de", "Montaña de", "Forja de"],     "sufijos": ["pesado", "del titan", "colosal", "de la montaña", "forjado"],        "materiales": ["hierro puro", "acero denso", "metal macizo", "piedra forjada"],                      "efectos": ["+2 daño pero -1 a tiradas de Destreza con él", "puede atravesar escudos débiles", "aturde en golpe crítico", "casi imposible de desarmar"] }
+  ],
+
+  "nombres_neutros": {
+    "prefijos": ["Filo de", "Sombra de", "Eco de", "Legado de", "Marca de", "Silencio de", "Aliento de", "Colmillo de", "Garra de", "Voz de"],
+    "sufijos":  ["el olvidado", "la tormenta", "la noche", "el alba", "el vacío", "los caídos", "la frontera", "el exilio", "la promesa rota", "el último juramento"]
+  },
+
+  "materiales_neutros": ["acero templado", "hierro forjado", "bronce antiguo", "acero de carbón", "hierro negro", "aleación desconocida"],
+
+  "descripciones_base": {
+    "espada_corta":  ["Una hoja corta y equilibrada, perfecta para espacios estrechos.", "Ligera y rápida, diseñada para atacar antes de que el enemigo reaccione.", "Compacta y confiable, con un filo que ha durado décadas."],
+    "espada_larga":  ["Una espada de filo recto con guardamano sencillo pero funcional.", "Equilibrada para ataques amplios y paradas precisas.", "Hoja larga con leve curvatura que permite estocadas y cortes con igual eficacia."],
+    "espadon":       ["Una hoja descomunal que requiere dos manos y toda la fuerza del portador.", "Diseñada para abrir paso entre grupos de enemigos con un solo arco.", "Pesada, imponente, y capaz de doblar escudos mediocres."],
+    "hacha":         ["Un hacha de mano con hoja asimétrica que concentra el peso en el golpe.", "Simple y brutal: no está diseñada para parar, sino para cortar.", "Mango corto y hoja ancha, ideal para ataques rápidos o lanzamiento."],
+    "hacha_guerra":  ["Un hacha colosal que exige dos manos y abre armaduras ligeras sin esfuerzo.", "La hoja doble permite cortes de retorno sin perder momentum.", "Pesada y temida, su solo aspecto hace que enemigos inexpertos retrocedan."],
+    "daga":          ["Una hoja corta pensada para cercanía extrema o lanzamiento preciso.", "Delgada y equilibrada, puede ocultarse fácilmente en ropa o equipaje.", "Discreta y letal a distancia corta, favorita de quien prefiere no ser visto."],
+    "lanza":         ["Un asta larga con punta de metal que puede usarse para empalar o arrojar.", "El equilibrio entre alcance y peso la hace efectiva tanto cuerpo a cuerpo como a distancia.", "Clásica y versátil, usada por soldados y cazadores por igual."],
+    "arco":          ["Un arco curvado a mano con cuerda de tripa bien mantenida.", "Ligero y preciso en manos entrenadas, completamente inútil en las demás.", "La madera mantiene tensión uniforme incluso en condiciones húmedas."],
+    "ballesta":      ["Un mecanismo de disparo que no requiere la misma fuerza que un arco, pero es más lento.", "Precisa y potente, favorita de quienes prefieren no depender de la práctica constante.", "El mecanismo de carga tarda, pero el impacto del proyectil es considerable."],
+    "maza":          ["Una cabeza de metal sólido montada en mango de madera. Simple y efectiva.", "Diseñada para transferir todo el impacto al objetivo, útil contra armaduras.", "El golpe aplasta más que corta: deja moretones profundos y huesos rotos."],
+    "baston":        ["Una vara larga con extremo reforzado, usada tanto para apoyarse como para combatir.", "En manos de un mago, el bastón amplifica la intención mágica del portador.", "La madera tiene propiedades que resuenan con energías arcanas."]
+  },
+
+  "ganchos": [
+    "Tiene grabado un nombre en la hoja que nadie del grupo reconoce.",
+    "El arma no puede ser desenfundada por quien haya mentido ese día.",
+    "Fue usada para matar a alguien importante. Quién lo sabe es otra pregunta.",
+    "Hay una recompensa activa por quien la entregue. No está claro de parte de quién.",
+    "El último dueño murió con ella en la mano. Y antes de él, lo mismo.",
+    "Vibra levemente cuando hay magia activa en un radio de diez pasos.",
+    "Alguien la está buscando activamente y tiene recursos para hacerlo.",
+    "Fue parte de un set. Las otras piezas están en manos de personas peligrosas.",
+    "Quien la forjó dejó una marca oculta que solo él puede leer.",
+    "El filo nunca se mella. Nadie sabe por qué. Nadie ha investigado demasiado."
+  ]
+}
