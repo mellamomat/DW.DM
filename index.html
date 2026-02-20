@@ -652,6 +652,7 @@
   <div class="gen-tabs">
     <button class="gen-tab active" onclick="switchGenTab('npc', this)">NPCs</button>
     <button class="gen-tab" onclick="switchGenTab('obj', this)">Objetos</button>
+    <button class="gen-tab" onclick="switchGenTab('arma', this)">Armas</button>
     <button class="gen-tab" onclick="switchGenTab('fac', this)">Facciones</button>
   </div>
 
@@ -673,6 +674,17 @@
     <div class="saved-section">
       <div class="saved-title">Guardados <span class="saved-count" id="obj-count">0</span></div>
       <div class="saved-list" id="obj-saved"></div>
+    </div>
+  </div>
+
+  <!-- ARMAS -->
+  <div class="gen-panel" id="gen-arma">
+    <div id="arma-selectors"></div>
+    <button class="gen-btn" onclick="genArma()">⚄ Generar arma</button>
+    <div id="arma-result"></div>
+    <div class="saved-section">
+      <div class="saved-title">Guardadas <span class="saved-count" id="arma-count">0</span></div>
+      <div class="saved-list" id="arma-saved"></div>
     </div>
   </div>
 
@@ -708,18 +720,21 @@ async function loadJSON(path) {
 
 async function loadAll() {
   try {
-    const [moves, npcs, objetos, facciones] = await Promise.all([
+    const [moves, npcs, objetos, facciones, armas] = await Promise.all([
       loadJSON('data/moves.json'),
       loadJSON('data/npcs.json'),
       loadJSON('data/objetos.json'),
-      loadJSON('data/facciones.json')
+      loadJSON('data/facciones.json'),
+      loadJSON('data/armas.json')
     ]);
     DATA.moves = moves;
     DATA.npcs = npcs;
     DATA.objetos = objetos;
     DATA.facciones = facciones;
+    DATA.armas = armas;
     initMoves();
     initObjCats();
+    initArmaSelectors();
     initSaved();
   } catch(e) {
     document.getElementById('moves-content').innerHTML =
@@ -862,6 +877,15 @@ function updateItem(type, id) {
     item.antag   = document.getElementById(`e_antag_${id}`).value;
     item.gancho  = document.getElementById(`e_gancho_${id}`).value;
   }
+  } else if (type === 'arma') {
+    item.nombre      = document.getElementById(`e_nombre_${id}`).value;
+    item.rareza      = document.getElementById(`e_rareza_${id}`).value;
+    item.precio_po   = document.getElementById(`e_precio_${id}`).value;
+    item.tags        = document.getElementById(`e_tags_${id}`).value.split(',').map(t=>t.trim()).filter(Boolean);
+    item.descripcion = document.getElementById(`e_desc_${id}`).value;
+    item.efectos     = document.getElementById(`e_efectos_${id}`).value.split('\n').map(t=>t.trim()).filter(Boolean);
+    item.ganchos     = document.getElementById(`e_gancho_${id}`).value.split('\n').map(t=>t.trim()).filter(Boolean);
+  }
   arr[idx] = item;
   setSaved(type, arr);
   renderSaved(type);
@@ -962,6 +986,31 @@ function savedItemHTML(type, item, editing) {
         <div><label style="${KEY_STYLE}">Antagonista de</label>${ta(`e_antag_${id}`, item.antag)}</div>
         <div><label style="${KEY_STYLE}">Gancho</label>${ta(`e_gancho_${id}`, item.gancho)}</div>
       </div>`;
+  } else if (type === 'arma') {
+    title = item.nombre;
+    sub   = `${item.tipo||''} · ${item.rareza||''}`;
+    const precioStr = item.precio_po == 0 ? 'Sin valor de mercado' : `~${item.precio_po} po`;
+    viewHTML = `
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.7rem;">
+        <span style="${RAR_STYLE}">${item.rareza||''}</span>
+        <span style="${PO_STYLE}">${precioStr}</span>
+        ${(item.tags||[]).map(t=>`<span style="${TAG_STYLE}">${t}</span>`).join('')}
+      </div>
+      <div>${item.descripcion||''}</div>
+      ${item.efectos&&item.efectos.length?`<div style="margin-top:0.6rem;">${item.efectos.map(e=>`<div style="padding:0.2rem 0;color:var(--text);">· ${e}</div>`).join('')}</div>`:''}
+      ${item.ganchos&&item.ganchos.length?item.ganchos.map(g=>`<div style="margin-top:0.5rem;padding:0.5rem 0.8rem;background:rgba(0,0,0,0.3);border-left:2px solid var(--border-glow);font-style:italic;color:var(--text-dim);">${g}</div>`).join(''):''}`;
+    editHTML = `
+      <div style="display:flex;flex-direction:column;gap:0.7rem;">
+        <div><label style="${KEY_STYLE}">Nombre</label>${inp(`e_nombre_${id}`, item.nombre)}</div>
+        <div style="display:flex;gap:0.5rem;">
+          <div style="flex:1"><label style="${KEY_STYLE}">Rareza</label>${inp(`e_rareza_${id}`, item.rareza||'')}</div>
+          <div style="flex:1"><label style="${KEY_STYLE}">Precio (po)</label>${inp(`e_precio_${id}`, item.precio_po||0)}</div>
+        </div>
+        <div><label style="${KEY_STYLE}">Tags (separados por coma)</label>${inp(`e_tags_${id}`, (item.tags||[]).join(', '))}</div>
+        <div><label style="${KEY_STYLE}">Descripción</label>${ta(`e_desc_${id}`, item.descripcion||'', 3)}</div>
+        <div><label style="${KEY_STYLE}">Efectos (uno por línea)</label>${ta(`e_efectos_${id}`, (item.efectos||[]).join('\n'), 3)}</div>
+        <div><label style="${KEY_STYLE}">Gancho</label>${ta(`e_gancho_${id}`, (item.ganchos||[]).join('\n'))}</div>
+      </div>`;
   }
 
   return `<div class="saved-item ${editing ? 'open' : ''}" id="saved-${id}">
@@ -1008,10 +1057,11 @@ function initSaved() {
   renderSaved('npc');
   renderSaved('obj');
   renderSaved('fac');
+  renderSaved('arma');
 }
 
 // ═══════════ CURRENT ITEM STATE (para editar el generado) ═══════════
-let currentGenerated = { npc: null, obj: null, fac: null };
+let currentGenerated = { npc: null, obj: null, fac: null, arma: null };
 
 // ═══════════ NPC GENERATOR ═══════════
 function renderNPCCard(data, editMode) {
@@ -1244,6 +1294,201 @@ function saveCurrentFac() {
   if (!currentGenerated.fac) return;
   saveItem('fac', Object.assign({}, currentGenerated.fac));
   document.querySelectorAll('#fac-result .save-btn').forEach(b => { if(b.textContent.includes('Guardar')){ b.textContent='✓ Guardado'; b.classList.add('saved'); }});
+}
+
+// ═══════════ ARMA GENERATOR ═══════════
+let selectedArmaTag = [];
+
+function initArmaSelectors() {
+  const d = DATA.armas;
+  const tiposHtml = d.tipos.map(t =>
+    `<button class="obj-cat-btn" id="arma-tipo-${t.id}" onclick="selectArmaTipo('${t.id}', this)">${t.label}</button>`
+  ).join('');
+  const rarezasHtml = d.rarezas.map(r =>
+    `<button class="obj-cat-btn" id="arma-rar-${r.id}" onclick="selectArmaRar('${r.id}', this)">${r.label}</button>`
+  ).join('');
+  const tagsHtml = d.tags_opcionales.map(t =>
+    `<button class="obj-cat-btn" id="arma-tag-${t.id}" onclick="toggleArmaTag('${t.id}', this)">${t.label}</button>`
+  ).join('');
+
+  document.getElementById('arma-selectors').innerHTML = `
+    <div style="margin-bottom:1.2rem;">
+      <div class="step-label" style="margin-bottom:0.5rem;">Tipo de arma</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${tiposHtml}</div>
+    </div>
+    <div style="margin-bottom:1.2rem;">
+      <div class="step-label" style="margin-bottom:0.5rem;">Rareza</div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${rarezasHtml}</div>
+    </div>
+    <div style="margin-bottom:1.2rem;">
+      <div class="step-label" style="margin-bottom:0.5rem;">Tags opcionales <span style="font-size:0.75rem;text-transform:none;letter-spacing:0;font-style:italic;color:var(--text-dim)">(elegí uno o más, o ninguno)</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${tagsHtml}</div>
+    </div>`;
+
+  // defaults
+  selectArmaTipo('espada_larga', document.getElementById('arma-tipo-espada_larga'));
+  selectArmaRar('poco_comun', document.getElementById('arma-rar-poco_comun'));
+}
+
+let selectedArmaTipoId = null;
+let selectedArmaRarId  = null;
+
+function selectArmaTipo(id, btn) {
+  selectedArmaTipoId = id;
+  document.querySelectorAll('[id^="arma-tipo-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function selectArmaRar(id, btn) {
+  selectedArmaRarId = id;
+  document.querySelectorAll('[id^="arma-rar-"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleArmaTag(id, btn) {
+  if (selectedArmaTag.includes(id)) {
+    selectedArmaTag = selectedArmaTag.filter(t => t !== id);
+    btn.classList.remove('active');
+  } else {
+    selectedArmaTag.push(id);
+    btn.classList.add('active');
+  }
+}
+
+function genArma() {
+  const d = DATA.armas;
+  const tipo   = d.tipos.find(t => t.id === selectedArmaTipoId);
+  const rareza = d.rarezas.find(r => r.id === selectedArmaRarId);
+  if (!tipo || !rareza) return;
+
+  const tags_sel = selectedArmaTag.map(id => d.tags_opcionales.find(t => t.id === id)).filter(Boolean);
+
+  // Nombre: si hay tags elegidos usamos sus listas, sino usamos nombres neutros
+  let prefijo, sufijo, material;
+  if (tags_sel.length > 0) {
+    const tagPrincipal = rand(tags_sel);
+    prefijo  = rand(tagPrincipal.prefijos);
+    sufijo   = rand(tagPrincipal.sufijos);
+    material = rand(tagPrincipal.materiales);
+  } else {
+    prefijo  = rand(d.nombres_neutros.prefijos);
+    sufijo   = rand(d.nombres_neutros.sufijos);
+    material = rand(d.materiales_neutros);
+  }
+
+  const parteTipo = rand(tipo.partes);
+  const nombre = `${prefijo} ${parteTipo} ${sufijo}`.replace(/\s+/g, ' ').trim();
+  // Capitalizar primera letra
+  const nombreFinal = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+
+  // Descripción base + adjetivos de tags
+  const descBase = rand(d.descripciones_base[tipo.id] || ['Un arma de aspecto peculiar.']);
+  const materialDesc = `Forjada en ${material}.`;
+
+  // Efectos según rareza y tags
+  let efectos = [];
+  const nEfectos = rareza.n_efectos + (tags_sel.length > 0 ? 1 : 0);
+  tags_sel.forEach(tag => {
+    if (tag.efectos && tag.efectos.length) efectos.push(rand(tag.efectos));
+  });
+  // Completar con efectos de tags si faltan
+  while (efectos.length < nEfectos && tags_sel.length > 0) {
+    const tag = rand(tags_sel);
+    const ef = rand(tag.efectos);
+    if (!efectos.includes(ef)) efectos.push(ef);
+  }
+
+  // Ganchos según rareza
+  let ganchos = [];
+  for (let i = 0; i < rareza.n_ganchos; i++) {
+    const g = rand(d.ganchos);
+    if (!ganchos.includes(g)) ganchos.push(g);
+  }
+
+  // Tags mecánicos finales
+  let tagsMec = [tipo.alcance, tipo.base_dano + (rareza.bonus_dano ? ' ' + rareza.bonus_dano : '') + ' daño'];
+  if (tipo.manos === 2) tagsMec.push('2 manos');
+  tags_sel.forEach(t => tagsMec.push(t.label.replace(/^[^\w]+/, '').trim()));
+
+  const precio = tipo.precio_base[rareza.id] || 0;
+  const precioStr = precio === 0 ? 'Sin valor de mercado' : `~${precio} po`;
+
+  const armaData = {
+    nombre: nombreFinal, tipo: tipo.label, rareza: rareza.label,
+    material, descripcion: descBase + ' ' + materialDesc,
+    efectos, ganchos, tags: tagsMec, precio_po: precio,
+    tags_tematicos: tags_sel.map(t => t.label)
+  };
+
+  currentGenerated.arma = armaData;
+  renderArmaCard(armaData, false);
+}
+
+function renderArmaCard(data, editMode) {
+  const tagsHtml = (data.tags||[]).map(t => `<span style="${TAG_STYLE}">${t}</span>`).join('');
+  const precioStr = data.precio_po == 0 ? 'Sin valor de mercado' : `~${data.precio_po} po`;
+
+  const viewContent = `
+    <div class="obj-tipo">${data.tipo}</div>
+    <div class="obj-nombre">${data.nombre}</div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+      <span style="${RAR_STYLE}">${data.rareza}</span>
+      <span style="${PO_STYLE}">${precioStr}</span>
+      ${tagsHtml}
+    </div>
+    <div class="obj-desc">${data.descripcion}</div>
+    ${data.efectos && data.efectos.length ? `
+      <div style="margin-top:0.8rem;">
+        <div style="${KEY_STYLE}margin-bottom:0.4rem;">Efectos especiales</div>
+        ${data.efectos.map(e => `<div style="padding:0.3rem 0;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text);">· ${e}</div>`).join('')}
+      </div>` : ''}
+    ${data.ganchos && data.ganchos.length ? `
+      <div style="margin-top:0.8rem;">
+        ${data.ganchos.map(g => `<div class="obj-gancho" style="margin-top:0.4rem;">${g}</div>`).join('')}
+      </div>` : ''}
+    <div style="display:flex;gap:0.5rem;margin-top:1rem;flex-wrap:wrap;">
+      <button class="save-btn" onclick="saveCurrentArma()">✦ Guardar arma</button>
+      <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="editCurrentArma()">✎ Editar</button>
+    </div>`;
+
+  const editContent = `
+    <div style="display:flex;flex-direction:column;gap:0.7rem;">
+      <div><label style="${KEY_STYLE}">Nombre</label>${inp('gen_a_nombre', data.nombre)}</div>
+      <div style="display:flex;gap:0.5rem;">
+        <div style="flex:1"><label style="${KEY_STYLE}">Rareza</label>${inp('gen_a_rareza', data.rareza)}</div>
+        <div style="flex:1"><label style="${KEY_STYLE}">Precio (po)</label>${inp('gen_a_precio', data.precio_po||0)}</div>
+      </div>
+      <div><label style="${KEY_STYLE}">Tags mecánicos (separados por coma)</label>${inp('gen_a_tags', (data.tags||[]).join(', '))}</div>
+      <div><label style="${KEY_STYLE}">Descripción</label>${ta('gen_a_desc', data.descripcion, 3)}</div>
+      <div><label style="${KEY_STYLE}">Efectos (uno por línea)</label>${ta('gen_a_efectos', (data.efectos||[]).join('\n'), 3)}</div>
+      <div><label style="${KEY_STYLE}">Gancho narrativo</label>${ta('gen_a_gancho', (data.ganchos||[]).join('\n'))}</div>
+      <div style="display:flex;gap:0.5rem;margin-top:0.3rem;flex-wrap:wrap;">
+        <button class="save-btn" onclick="applyEditArma()">✓ Aplicar cambios</button>
+        <button class="save-btn" onclick="saveCurrentArma()">✦ Guardar arma</button>
+        <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="renderArmaCard(currentGenerated.arma,false)">Cancelar</button>
+      </div>
+    </div>`;
+
+  document.getElementById('arma-result').innerHTML = `<div class="obj-card">${editMode ? editContent : viewContent}</div>`;
+}
+
+function editCurrentArma() { renderArmaCard(currentGenerated.arma, true); }
+
+function applyEditArma() {
+  currentGenerated.arma.nombre      = document.getElementById('gen_a_nombre').value;
+  currentGenerated.arma.rareza      = document.getElementById('gen_a_rareza').value;
+  currentGenerated.arma.precio_po   = document.getElementById('gen_a_precio').value;
+  currentGenerated.arma.tags        = document.getElementById('gen_a_tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  currentGenerated.arma.descripcion = document.getElementById('gen_a_desc').value;
+  currentGenerated.arma.efectos     = document.getElementById('gen_a_efectos').value.split('\n').map(t=>t.trim()).filter(Boolean);
+  currentGenerated.arma.ganchos     = document.getElementById('gen_a_gancho').value.split('\n').map(t=>t.trim()).filter(Boolean);
+  renderArmaCard(currentGenerated.arma, false);
+}
+
+function saveCurrentArma() {
+  if (!currentGenerated.arma) return;
+  saveItem('arma', Object.assign({}, currentGenerated.arma));
+  document.querySelectorAll('#arma-result .save-btn').forEach(b => { if(b.textContent.includes('Guardar')){ b.textContent='✓ Guardada'; b.classList.add('saved'); }});
 }
 
 // ═══════════ NAV ═══════════
