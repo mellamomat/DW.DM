@@ -1423,7 +1423,7 @@ function genArma() {
   }
 
   // Tags mecánicos finales
-  let tagsMec = [tipo.alcance, tipo.base_dano + (rareza.bonus_dano ? ' ' + rareza.bonus_dano : '') + ' daño'];
+  let tagsMec = [tipo.alcance];
   if (tipo.manos === 2) tagsMec.push('2 manos');
   tags_sel.forEach(t => tagsMec.push(t.label.replace(/^[^\w]+/, '').trim()));
 
