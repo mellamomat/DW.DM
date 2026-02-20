@@ -7,17 +7,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0e0c09;
-    --surface: #161310;
-    --surface2: #1e1a15;
-    --border: #3a3020;
-    --border-glow: #8b6914;
-    --gold: #c9a84c;
-    --gold-light: #e8c96a;
-    --text: #d4c9a8;
-    --text-dim: #7a6e55;
-    --text-bright: #f0e6c8;
-    --ink: #b5a882;
+    --bg: #0d0b12;
+    --surface: #13101a;
+    --surface2: #1a1524;
+    --border: #2e2040;
+    --border-glow: #6b3fa0;
+    --gold: #a87fd4;
+    --gold-light: #c9a8f0;
+    --text: #cdc0e0;
+    --text-dim: #6b5c85;
+    --text-bright: #ede0ff;
+    --ink: #a090bb;
     --green: #5dbe7a;
     --orange: #e8954a;
     --red: #e05a4b;
@@ -628,7 +628,10 @@
 <body>
 
 <nav>
-  <div class="nav-title">⚔ DW · GM</div>
+  <div class="nav-title">
+    <img src="logo.png" alt="Logo" style="height:28px;width:28px;object-fit:contain;border-radius:4px;vertical-align:middle;margin-right:0.5rem;" onerror="this.style.display='none'">
+    DW · GM
+  </div>
   <button class="nav-btn active" onclick="showSection('moves', this)">Moves del GM</button>
   <button class="nav-btn" onclick="showSection('gen', this)">Generadores</button>
 </nav>
@@ -873,6 +876,8 @@ function updateItem(type, id) {
     item.nombre   = document.getElementById(`e_nombre_${id}`).value;
     item.ocupacion= document.getElementById(`e_ocupacion_${id}`).value;
     item.pv       = document.getElementById(`e_pv_${id}`).value;
+    item.dano     = document.getElementById(`e_dano_${id}`).value;
+    item.dano_nota= document.getElementById(`e_dano_nota_${id}`).value;
     item.rasgo    = document.getElementById(`e_rasgo_${id}`).value;
     item.motiv    = document.getElementById(`e_motiv_${id}`).value;
     item.actitud  = document.getElementById(`e_actitud_${id}`).value;
@@ -929,9 +934,11 @@ function savedItemHTML(type, item, editing) {
   if (type === 'npc') {
     title = item.nombre;
     sub   = item.ocupacion;
+    const danoStyle = `background:rgba(232,149,74,0.12);border:1px solid rgba(232,149,74,0.4);color:#e8954a;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:2px;`;
     viewHTML = `
       <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:0.7rem;">
         <span style="${PV_STYLE}">${item.pv} PV · ${item.peligrosidad||''}</span>
+        <span style="${danoStyle}">Daño ${item.dano||'d6'} · ${item.dano_nota||''}</span>
         ${(item.tags||[]).map(t=>`<span style="${TAG_STYLE}">${t}</span>`).join('')}
       </div>
       <div style="display:flex;flex-direction:column;gap:0.4rem;">
@@ -946,6 +953,8 @@ function savedItemHTML(type, item, editing) {
         <div><label style="${KEY_STYLE}">Ocupación</label>${inp(`e_ocupacion_${id}`, item.ocupacion)}</div>
         <div style="display:flex;gap:0.5rem;">
           <div style="flex:1"><label style="${KEY_STYLE}">PV</label>${inp(`e_pv_${id}`, item.pv)}</div>
+          <div style="flex:1"><label style="${KEY_STYLE}">Dado daño</label>${inp(`e_dano_${id}`, item.dano||'d6')}</div>
+          <div style="flex:2"><label style="${KEY_STYLE}">Nota daño</label>${inp(`e_dano_nota_${id}`, item.dano_nota||'')}</div>
         </div>
         <div><label style="${KEY_STYLE}">Tags (separados por coma)</label>${inp(`e_tags_${id}`, (item.tags||[]).join(', '))}</div>
         <div><label style="${KEY_STYLE}">Apariencia</label>${ta(`e_rasgo_${id}`, item.rasgo)}</div>
@@ -1083,11 +1092,13 @@ let currentGenerated = { npc: null, obj: null, fac: null, arma: null };
 // ═══════════ NPC GENERATOR ═══════════
 function renderNPCCard(data, editMode) {
   const tagsHtml = (data.tags||[]).map(t=>`<span style="${TAG_STYLE}">${t}</span>`).join('');
+  const danoStyle = `background:rgba(232,149,74,0.12);border:1px solid rgba(232,149,74,0.4);color:#e8954a;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:2px;`;
   const viewContent = `
     <div class="npc-name">${data.nombre}</div>
     <div class="npc-occ">${data.ocupacion}</div>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;">
       <span style="${PV_STYLE}">${data.pv} PV · ${data.peligrosidad||''}</span>
+      <span style="${danoStyle}">Daño ${data.dano||'d6'} · ${data.dano_nota||''}</span>
       ${tagsHtml}
     </div>
     <div class="npc-rows">
@@ -1106,6 +1117,8 @@ function renderNPCCard(data, editMode) {
       <div><label style="${KEY_STYLE}">Ocupación</label>${inp('gen_ocupacion', data.ocupacion)}</div>
       <div style="display:flex;gap:0.5rem;">
         <div style="flex:1"><label style="${KEY_STYLE}">PV</label>${inp('gen_pv', data.pv)}</div>
+        <div style="flex:1"><label style="${KEY_STYLE}">Dado de daño</label>${inp('gen_dano', data.dano||'d6')}</div>
+        <div style="flex:2"><label style="${KEY_STYLE}">Nota de daño</label>${inp('gen_dano_nota', data.dano_nota||'')}</div>
       </div>
       <div><label style="${KEY_STYLE}">Tags (separados por coma)</label>${inp('gen_tags', (data.tags||[]).join(', '))}</div>
       <div><label style="${KEY_STYLE}">Apariencia</label>${ta('gen_rasgo', data.rasgo)}</div>
@@ -1115,7 +1128,7 @@ function renderNPCCard(data, editMode) {
       <div style="display:flex;gap:0.5rem;margin-top:0.3rem;flex-wrap:wrap;">
         <button class="save-btn" onclick="applyEditNPC()">✓ Aplicar cambios</button>
         <button class="save-btn" onclick="saveCurrentNPC()">✦ Guardar NPC</button>
-        <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="renderNPCCard(currentGenerated.npc, false);document.getElementById('npc-result').innerHTML=lastNPCHTML;">Cancelar</button>
+        <button class="save-btn" style="border-color:var(--border);color:var(--text-dim);" onclick="renderNPCCard(currentGenerated.npc, false)">Cancelar</button>
       </div>
     </div>`;
   document.getElementById('npc-result').innerHTML = `<div class="npc-card">${editMode ? editContent : viewContent}</div>`;
@@ -1134,7 +1147,7 @@ function genNPC() {
   const pv  = Math.floor(Math.random() * (cat.pv_max - cat.pv_min + 1)) + cat.pv_min;
   const shuffled = [...d.tags].sort(() => Math.random() - 0.5);
   const tags = shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
-  currentGenerated.npc = { nombre, ocupacion, rasgo, motiv, secreto, actitud, pv, peligrosidad: cat.label, tags };
+  currentGenerated.npc = { nombre, ocupacion, rasgo, motiv, secreto, actitud, pv, peligrosidad: cat.label, dano: cat.dano, dano_nota: cat.dano_nota, tags };
   renderNPCCard(currentGenerated.npc, false);
 }
 
@@ -1144,6 +1157,8 @@ function applyEditNPC() {
   currentGenerated.npc.nombre    = document.getElementById('gen_nombre').value;
   currentGenerated.npc.ocupacion = document.getElementById('gen_ocupacion').value;
   currentGenerated.npc.pv        = document.getElementById('gen_pv').value;
+  currentGenerated.npc.dano      = document.getElementById('gen_dano').value;
+  currentGenerated.npc.dano_nota = document.getElementById('gen_dano_nota').value;
   currentGenerated.npc.rasgo     = document.getElementById('gen_rasgo').value;
   currentGenerated.npc.motiv     = document.getElementById('gen_motiv').value;
   currentGenerated.npc.actitud   = document.getElementById('gen_actitud').value;
@@ -1422,10 +1437,25 @@ function genArma() {
     if (!ganchos.includes(g)) ganchos.push(g);
   }
 
-  // Tags mecánicos finales
-  let tagsMec = [tipo.alcance];
-  if (tipo.manos === 2) tagsMec.push('2 manos');
-  tags_sel.forEach(t => tagsMec.push(t.label.replace(/^[^\w]+/, '').trim()));
+  // Tags mecánicos finales: partimos de los tags fijos del tipo (fieles a DW)
+  let tagsMec = [...(tipo.tags_fijos || [])];
+  // Bonus de rareza si existe (ej: "+1 daño") y no está ya incluido
+  if (rareza.bonus_dano && !tagsMec.includes(rareza.bonus_dano)) {
+    // Si el tipo ya tiene un bonus de daño fijo, sumamos en lugar de duplicar
+    const existente = tagsMec.findIndex(t => t.match(/^\+\d+ da/));
+    if (existente >= 0) {
+      const baseNum  = parseInt(tagsMec[existente]) || 0;
+      const bonusNum = parseInt(rareza.bonus_dano)  || 0;
+      tagsMec[existente] = `+${baseNum + bonusNum} daño`;
+    } else {
+      tagsMec.push(rareza.bonus_dano);
+    }
+  }
+  // Tags temáticos elegidos (solo el nombre limpio, sin emoji)
+  tags_sel.forEach(t => {
+    const limpio = t.label.replace(/^[^\wÀ-ÿ]+\s*/, '').trim();
+    if (!tagsMec.includes(limpio)) tagsMec.push(limpio);
+  });
 
   const precio = tipo.precio_base[rareza.id] || 0;
   const precioStr = precio === 0 ? 'Sin valor de mercado' : `~${precio} po`;

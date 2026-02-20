@@ -1,6 +1,5 @@
 {
   "_instrucciones": "Cada objeto tiene nombre, descripcion, gancho, rareza, precio_po (piezas de oro estimadas) y tags. Tags mezclan mecanicos de DW con descriptores narrativos.",
-
   "categorias": [
     {
       "id": "armas",
@@ -12,7 +11,11 @@
           "gancho": "La empunadura tiene grabado un nombre que nadie del grupo reconoce.",
           "rareza": "Comun",
           "precio_po": 15,
-          "tags": ["cercano", "1d8 dano", "historia visible", "confiable"]
+          "tags": [
+            "cercano",
+            "historia visible",
+            "confiable"
+          ]
         },
         {
           "nombre": "Daga con veneno reseco",
@@ -20,7 +23,12 @@
           "gancho": "El veneno no es de ninguna planta local.",
           "rareza": "Poco comun",
           "precio_po": 60,
-          "tags": ["cercano", "1d6 dano", "preciso", "envenendado (inactivo)", "discreto"]
+          "tags": [
+            "cercano",
+            "preciso",
+            "envenendado (inactivo)",
+            "discreto"
+          ]
         },
         {
           "nombre": "Arco sin cuerda",
@@ -28,7 +36,11 @@
           "gancho": "Nadie puede identificar la madera. No crece en ningun bosque conocido.",
           "rareza": "Raro",
           "precio_po": 120,
-          "tags": ["lejano", "1d8 dano", "misterioso", "incompleto"]
+          "tags": [
+            "lejano",
+            "misterioso",
+            "incompleto"
+          ]
         },
         {
           "nombre": "Hacha de guerra con runa borrada",
@@ -36,7 +48,12 @@
           "gancho": "La runa incompleta hace que el arma vibre levemente al acercarse a magia.",
           "rareza": "Poco comun",
           "precio_po": 80,
-          "tags": ["cercano", "2 manos", "1d10 dano", "magico (debilitado)", "detecta magia"]
+          "tags": [
+            "cercano",
+            "2 manos",
+            "magico (debilitado)",
+            "detecta magia"
+          ]
         },
         {
           "nombre": "Lanza rota",
@@ -44,7 +61,11 @@
           "gancho": "La otra mitad podria estar en manos de alguien importante.",
           "rareza": "Comun",
           "precio_po": 5,
-          "tags": ["cercano", "1d6 dano", "improvisada", "narrativamente valiosa"]
+          "tags": [
+            "cercano",
+            "improvisada",
+            "narrativamente valiosa"
+          ]
         }
       ]
     },
@@ -58,7 +79,13 @@
           "gancho": "Los animales la evitan. Los no-muertos se acercan a ella.",
           "rareza": "Raro",
           "precio_po": 300,
-          "tags": ["magico", "luz fria", "atrae no-muertos", "inextinguible", "inquietante"]
+          "tags": [
+            "magico",
+            "luz fria",
+            "atrae no-muertos",
+            "inextinguible",
+            "inquietante"
+          ]
         },
         {
           "nombre": "Espejo que muestra el pasado",
@@ -66,7 +93,13 @@
           "gancho": "Una de las escenas muestra a uno de los PJs, pero en un momento que aun no ocurrio.",
           "rareza": "Muy raro",
           "precio_po": 800,
-          "tags": ["magico", "vision del pasado", "mudo", "revelador", "perturbador"]
+          "tags": [
+            "magico",
+            "vision del pasado",
+            "mudo",
+            "revelador",
+            "perturbador"
+          ]
         },
         {
           "nombre": "Llave que no abre nada conocido",
@@ -74,7 +107,13 @@
           "gancho": "Quienes la llevan tienen suenos con una puerta especifica.",
           "rareza": "Raro",
           "precio_po": 200,
-          "tags": ["magico", "pesada", "onirico", "llave de algo", "misterioso"]
+          "tags": [
+            "magico",
+            "pesada",
+            "onirico",
+            "llave de algo",
+            "misterioso"
+          ]
         },
         {
           "nombre": "Moneda de cara desconocida",
@@ -82,7 +121,12 @@
           "gancho": "La moneda siempre cae del mismo lado.",
           "rareza": "Poco comun",
           "precio_po": 150,
-          "tags": ["magico", "profetico", "manipulado", "invendible"]
+          "tags": [
+            "magico",
+            "profetico",
+            "manipulado",
+            "invendible"
+          ]
         },
         {
           "nombre": "Libro en blanco que escribe solo",
@@ -90,7 +134,13 @@
           "gancho": "Lo que escribe parece saber cosas sobre quienes lo sostienen.",
           "rareza": "Muy raro",
           "precio_po": 1200,
-          "tags": ["magico", "lunar", "omnisciente", "peligroso", "revelador"]
+          "tags": [
+            "magico",
+            "lunar",
+            "omnisciente",
+            "peligroso",
+            "revelador"
+          ]
         }
       ]
     },
@@ -104,7 +154,12 @@
           "gancho": "El sector que falta coincide con el area que necesitan explorar.",
           "rareza": "Comun",
           "precio_po": 20,
-          "tags": ["informacion", "incompleto", "valioso contextualmente", "hecho a mano"]
+          "tags": [
+            "informacion",
+            "incompleto",
+            "valioso contextualmente",
+            "hecho a mano"
+          ]
         },
         {
           "nombre": "Carta sin destinatario",
@@ -112,7 +167,12 @@
           "gancho": "El contenido implica una traicion a alguien que todavia esta vivo.",
           "rareza": "Comun",
           "precio_po": 0,
-          "tags": ["informacion", "comprometedor", "historico", "peligroso de tener"]
+          "tags": [
+            "informacion",
+            "comprometedor",
+            "historico",
+            "peligroso de tener"
+          ]
         },
         {
           "nombre": "Frasco de liquido sin etiqueta",
@@ -120,7 +180,12 @@
           "gancho": "No se congela. No hierve. No reacciona a nada.",
           "rareza": "Desconocida",
           "precio_po": 0,
-          "tags": ["desconocido", "estable", "posiblemente magico", "sin clasificar"]
+          "tags": [
+            "desconocido",
+            "estable",
+            "posiblemente magico",
+            "sin clasificar"
+          ]
         },
         {
           "nombre": "Medallon con retrato borrado",
@@ -128,7 +193,12 @@
           "gancho": "La ropa del retrato permite fechar la pintura en menos de diez anos.",
           "rareza": "Comun",
           "precio_po": 35,
-          "tags": ["personal", "misterioso", "reciente", "alguien lo extrania"]
+          "tags": [
+            "personal",
+            "misterioso",
+            "reciente",
+            "alguien lo extrania"
+          ]
         },
         {
           "nombre": "Llave de posada con numero",
@@ -136,7 +206,12 @@
           "gancho": "Alguien la esta buscando activamente.",
           "rareza": "Comun",
           "precio_po": 0,
-          "tags": ["mundano", "buscado", "acceso a algo", "sin contexto"]
+          "tags": [
+            "mundano",
+            "buscado",
+            "acceso a algo",
+            "sin contexto"
+          ]
         }
       ]
     }
